@@ -212,6 +212,12 @@
     endButtonLoading();
     enableBtn.removeAttribute('disabled');
     btnLabelText.textContent = restoreLabel;
+    // The pill must tell the same story as the card and the button:
+    // back to its exact pre-activation idle state (no 'on', idle
+    // copy) — never left sitting on «جارٍ تفعيل البوصلة…» while
+    // everything else says the activation is over.
+    liveDot.classList.remove('on');
+    liveText.textContent = 'البوصلة غير مفعّلة';
     showToast('يلزم إذن الحركة لعمل البوصلة');
     statusTitle.textContent = 'إذن الحركة متوقف';
     statusDesc.textContent = 'فعّل إذن الحركة من إعدادات المتصفح لهذا الموقع، ثم أعد تحميل الصفحة واضغط زر التفعيل من جديد.';
