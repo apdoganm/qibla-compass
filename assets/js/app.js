@@ -11,34 +11,33 @@
     // normal non-red styling, and an atomic flip to the red error
     // state if no real heading sample arrives in time. When the
     // sensor API is known-absent the wait is skipped entirely.
+    //
+    // ORDER IS THE CONTRACT: the pending state is entered FIRST and
+    // synchronously — pill + locating copy, the button's .loading
+    // dots, disabled + aria-busy, and the 3 s deadline clock all
+    // start in this same task, BEFORE anything that can hang is
+    // started. Geolocation then runs in parallel (its own 3 s
+    // timeout, never gating the button), and the motion-permission
+    // request — where the browser exposes one — is raced against
+    // 1.2 s inside requestMotionPermission(): a permission promise
+    // that never settles can never block the deadline again.
     state.enabled = true;
     if (typeof DeviceOrientationEvent === 'undefined'){
       startOrientation();   // → enterUnsupported() synchronously
       requestLocation();    // silent branch: the decision is already made
       return;
     }
+    var restoreLabel = btnLabelText.textContent; // for an explicit permission denial
     enterActivating();
+    startActivationClock();   // the 3 s deadline starts NOW — before any await
     // requestLocation runs while state.unsupported may still be set
     // (retry): its silent branch then avoids overwriting the pending
     // copy, while its fix still refreshes the data cards.
     requestLocation();
     if (typeof DeviceOrientationEvent.requestPermission === 'function'){
-      DeviceOrientationEvent.requestPermission().then(function(res){
-        if (res === 'granted'){ startOrientation(); } // arms the 3 s deadline
-        else {
-          state.activating = false;
-          endButtonLoading();
-          enableBtn.removeAttribute('disabled');
-          btnLabelText.textContent = 'تفعيل البوصلة والموقع';
-          showToast('يلزم إذن الحركة لعمل البوصلة');
-          statusTitle.textContent = 'إذن الحركة متوقف';
-          statusDesc.textContent = 'فعّل إذن الحركة من إعدادات المتصفح لهذا الموقع، ثم أعد تحميل الصفحة واضغط زر التفعيل من جديد.';
-        }
-      }).catch(function(){
-        showToast('تعذّر طلب إذن الحركة — أعد المحاولة');
-      });
+      requestMotionPermission(restoreLabel);
     } else {
-      startOrientation();   // arms the 3 s deadline
+      attachOrientationListeners();
     }
   });
   locateBtn.addEventListener('click', requestLocation);

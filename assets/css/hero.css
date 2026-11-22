@@ -25,9 +25,10 @@
        Split favours the compass (.82/1.18): at the 1320px wrap the
        text column still lands ≈500px, so the headline never crushes.
        SHARED VERTICAL RHYTHM (user spec): both columns stretch to the
-       same row height and become flex columns with pinned ends —
-       text column: headline at the very top, the small note pinned
-       to the bottom (margin-top:auto); compass column: mode switch
+       same row height — text column: headline at the very top, the
+       small note following the buttons at a fixed 32px in EVERY
+       layout (the user's latest explicit order; it is not bottom-
+       pinned); compass column: mode switch
        at the very top (zone padding removed, so its top edge is on
        the headline's line), turn hint pinned to the bottom via the
        1fr/auto grid inside #viewCompass, and the dial centred in the

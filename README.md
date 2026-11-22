@@ -51,7 +51,16 @@ design, copy and styling are unchanged — the code is only split into files.
   claiming the compass is on. The location-based data (Qibla angle,
   distance, coordinates, declination) still populates normally, and a
   real heading sample arriving later clears the state automatically.
-  (iOS motion-permission denial keeps its own separate message.)
+  (iOS motion-permission denial keeps its own separate message.
+  The pending state and the deadline clock start synchronously on
+  the tap, before anything that can hang: where the browser exposes
+  `DeviceOrientationEvent.requestPermission`, the request runs in
+  parallel and is raced against 1.2 s — 'granted', any other answer,
+  a rejection, a throw, or no answer at all simply attach the
+  orientation listeners and let the 3 s deadline govern, while only
+  an explicit 'denied' resolution enters the permission-stopped
+  state and cancels the clock. A permission promise that never
+  settles can never block the deadline.)
   Every activation — first tap and every retry — runs against a
   3-second deadline: while it runs, the status card shows the
   locating copy in the normal (non-red) styling and the activation

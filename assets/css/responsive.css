@@ -24,15 +24,18 @@
     }
   }
   /* ===== Desktop hero rhythm (≥1080px two-column) =====
-     Equal-height columns with pinned ends (see hero.css): text
-     column is a flex column with the note pinned to the bottom;
-     compass column drops its zone padding (switch top == headline
-     top) and #viewCompass becomes a 1fr/auto grid that fills the
-     column — dial centred in the 1fr middle, turn hint in the auto
-     row at the bottom (hint bottom == note bottom). */
+     Equal-height columns (see hero.css): text column is a flex
+     column; compass column drops its zone padding (switch top ==
+     headline top) and #viewCompass becomes a 1fr/auto grid that
+     fills the column — dial centred in the 1fr middle, turn hint
+     in the auto row at the bottom. The note is NOT bottom-pinned:
+     the user's latest explicit order («النص ده تحت الازرار بـ32px»)
+     supersedes the old hint-bottom == note-bottom alignment — the
+     note simply follows the buttons at exactly 32px in EVERY
+     layout, this one included. */
   @media (min-width:1080px){
     .hero > div:first-child{ display:flex; flex-direction:column; }
-    .hero > div:first-child .hint{ margin-top:auto; padding-top:32px; }
+    .hero > div:first-child .hint{ margin-top:32px; }
     .compass-zone{ padding:0; }
     #viewCompass{ flex:1; width:100%; display:grid; grid-template-rows:1fr auto; justify-items:center; }
     #viewCompass .compass-wrap{ align-self:center; }

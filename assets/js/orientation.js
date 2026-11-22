@@ -60,7 +60,8 @@
 
      Activation deadline (user-specified): EVERY activation — the
      first tap and every retry — gets exactly ACTIVATION_DEADLINE_MS
-     (3 s), armed by startOrientation(). While the window runs, the
+     (3 s), armed by the click handler (app.js) BEFORE anything that
+     can hang is started. While the window runs, the
      UI is in the pending state (enterActivating): locating copy in
      the NORMAL, non-red styling — red is reserved for the decided
      error. If a genuinely valid sample arrives in time,
@@ -128,6 +129,8 @@
     statusTitle.textContent = 'جارٍ تحديد موقعك…';
     statusDesc.textContent = 'لحظات ونحسب زاوية القبلة من مكانك الحالي.';
     enableBtn.setAttribute('disabled', 'disabled');
+    enableBtn.classList.add('loading');
+    enableBtn.setAttribute('aria-busy', 'true');
     btnLabelText.textContent = 'جارٍ التفعيل';
   }
   function enterUnsupported(){
@@ -164,17 +167,75 @@
     }
   }
   var orientationStarted = false;
+  function attachOrientationListeners(){
+    if (orientationStarted) return;
+    orientationStarted = true;
+    window.addEventListener('deviceorientationabsolute', function(e){ onOrientation(e, true); }, true);
+    window.addEventListener('deviceorientation', function(e){ onOrientation(e, e.absolute === true); }, true);
+  }
   function startOrientation(){
-    if (!orientationStarted){
-      orientationStarted = true;
-      window.addEventListener('deviceorientationabsolute', function(e){ onOrientation(e, true); }, true);
-      window.addEventListener('deviceorientation', function(e){ onOrientation(e, e.absolute === true); }, true);
-    }
     if (typeof DeviceOrientationEvent === 'undefined'){
       // Known-absent sensor API: skip the 3 s wait entirely — no
       // loading state for a failure that is already known.
       enterUnsupported();
       return;
     }
+    attachOrientationListeners();
     startActivationClock();
+  }
+
+  /* ---------- Motion permission (DeviceOrientationEvent.requestPermission) ----------
+     The permission request runs in PARALLEL with the activation
+     window — it never gates it. The click handler has already
+     entered the pending state and started the 3 s deadline clock
+     before this is called; here the request is simply raced
+     against PERMISSION_RACE_MS:
+       · resolves 'denied'  → enterPermissionStopped() (the ONLY
+         path into that state — a hang, a timeout or an exception
+         can never produce it),
+       · resolves 'granted' (or anything else), rejects, throws,
+         or produces no answer within PERMISSION_RACE_MS
+                            → attach the orientation listeners,
+         exactly like the no-permission path, and let the already-
+         running 3 s deadline govern (null-only samples flip to the
+         red unsupported state on time).
+     A permission promise that never settles therefore can never
+     block the deadline: worst case the listeners attach at the
+     race timeout and the window still decides at t = 3 s. */
+  var PERMISSION_RACE_MS = 1200;
+  function enterPermissionStopped(restoreLabel){
+    // A denial that arrives after the window already decided — a
+    // live sample or the red error — must not clobber that decision.
+    if (!state.activating || state.sensorSeen) return;
+    state.activating = false;
+    stopActivationClock();   // cancels the deadline: no flip at 3 s
+    endButtonLoading();
+    enableBtn.removeAttribute('disabled');
+    btnLabelText.textContent = restoreLabel;
+    showToast('يلزم إذن الحركة لعمل البوصلة');
+    statusTitle.textContent = 'إذن الحركة متوقف';
+    statusDesc.textContent = 'فعّل إذن الحركة من إعدادات المتصفح لهذا الموقع، ثم أعد تحميل الصفحة واضغط زر التفعيل من جديد.';
+  }
+  function requestMotionPermission(restoreLabel){
+    var answered = false;
+    var timer = setTimeout(function(){
+      // No answer in time → proceed to the listeners; a late answer
+      // is still honoured by onAnswer below while the window is open.
+      attachOrientationListeners();
+    }, PERMISSION_RACE_MS);
+    function onAnswer(res){
+      if (answered) return;
+      answered = true;
+      clearTimeout(timer);
+      if (res === 'denied') enterPermissionStopped(restoreLabel);
+      else attachOrientationListeners();
+    }
+    var result;
+    try {
+      result = DeviceOrientationEvent.requestPermission();
+    } catch(e){
+      onAnswer('error');   // a throw is not a denial → normal path
+      return;
+    }
+    Promise.resolve(result).then(onAnswer, function(){ onAnswer('error'); });
   }
