@@ -220,7 +220,20 @@
     liveText.textContent = 'البوصلة غير مفعّلة';
     showToast('يلزم إذن الحركة لعمل البوصلة');
     statusTitle.textContent = 'إذن الحركة متوقف';
-    statusDesc.textContent = 'فعّل إذن الحركة من إعدادات المتصفح لهذا الموقع، ثم أعد تحميل الصفحة واضغط زر التفعيل من جديد.';
+    // Brave blocks motion sensors by default and its
+    // requestPermission() resolves 'denied' with NO prompt at
+    // all — no web API can make the browser re-show a dialog
+    // it never showed, so on Brave the card itself carries the
+    // exact unblock steps instead of the generic ones. (Once
+    // the user flips that setting, the very next tap re-runs
+    // the whole activation flow with a fresh requestPermission()
+    // call — the click handler in app.js never caches a result —
+    // so the compass goes live with no page reload.)
+    if (typeof QiblaDevice !== 'undefined' && QiblaDevice.isBrave){
+      statusDesc.textContent = 'متصفح Brave يحجب حساسات الحركة افتراضياً. للسماح: قائمة المتصفح ← الإعدادات ← إعدادات المواقع ← «الحركة والاتجاه» وفعّل السماح، ثم ارجع واضغط زر التفعيل من جديد.';
+    } else {
+      statusDesc.textContent = 'فعّل إذن الحركة من إعدادات المتصفح لهذا الموقع، ثم أعد تحميل الصفحة واضغط زر التفعيل من جديد.';
+    }
   }
   function requestMotionPermission(restoreLabel){
     var answered = false;

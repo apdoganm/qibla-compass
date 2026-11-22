@@ -115,10 +115,32 @@
       }).catch(function(){ /* hints are a refinement only — UA result stands */ });
     }
 
+    /* ---------- Brave detection (async, optional) ----------
+       Brave blocks device-motion sensors by default, and its
+       DeviceOrientationEvent.requestPermission() resolves
+       'denied' without ever showing a prompt — so on Brave the
+       permission-stopped card needs browser-specific unblock
+       steps (orientation.js reads this flag when it fills that
+       card). Detection is the browser's own official API:
+       navigator.brave.isBrave() returns a promise. It is never
+       awaited and never blocks anything: the flag simply flips
+       true when the answer lands, long before a first tap can
+       happen. Every other browser lacks the API and keeps the
+       default false. */
+    var braveDetected = false;
+    if (navigator.brave && typeof navigator.brave.isBrave === 'function'){
+      try {
+        navigator.brave.isBrave().then(function(v){
+          braveDetected = (v === true);
+        }).catch(function(){ /* detection is best-effort — false stands */ });
+      } catch(e){ /* detection is best-effort — false stands */ }
+    }
+
     return {
       get type(){ return current.type; },
       get noun(){ return current.noun; },
       get bare(){ return current.bare; },
+      get isBrave(){ return braveDetected; },
       fill: fill,
       detectType: detectType
     };
