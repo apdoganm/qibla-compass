@@ -1,0 +1,15 @@
+/* ============================================================
+   بوصلة القبلة — base / reset
+   ============================================================ */
+  *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html{ scroll-behavior:smooth; }
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"IBM Plex Sans Arabic", -apple-system, "Segoe UI", Tahoma, sans-serif;
+    line-height:1.7;
+    overflow-x:hidden;
+  }
+  button{ font-family:inherit; cursor:pointer; min-height:48px; }
+  .wrap{ max-width:1120px; margin:0 auto; padding:0 clamp(14px, 4.5vw, 20px); }

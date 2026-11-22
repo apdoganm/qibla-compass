@@ -1,0 +1,18 @@
+/* ============================================================
+   بوصلة القبلة — design tokens (CSS custom properties)
+   ============================================================ */
+  :root{
+    --bg:#ffffff;
+    --ink:#000000;
+    --ink-2:#3d3d3d;
+    --sub:#6f6f6f;
+    --line:#e3e3e3;
+    --line-soft:#eeeeee;
+    --soft:#f7f7f7;
+    --green:#00b140;
+    --green-dark:#009436;
+    --green-soft:#e8f9ee;
+    --gold:#c9a227;
+    --radius:20px;
+    --dial-size:min(86vw, 400px);
+  }

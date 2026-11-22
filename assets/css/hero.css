@@ -1,0 +1,52 @@
+/* ============================================================
+   بوصلة القبلة — hero, status pill & buttons
+   ============================================================ */
+  /* ===== Hero layout ===== */
+  .hero{
+    display:grid; grid-template-columns:1fr; gap:8px;
+    padding:18px 0 8px;
+  }
+  @media (min-width:960px){
+    .hero{ grid-template-columns:1.05fr .95fr; gap:56px; align-items:center; padding:34px 0 10px; }
+  }
+  h1{
+    font-size:clamp(38px, 6.4vw, 58px);
+    line-height:1.25; font-weight:700; margin:0 0 14px;
+  }
+  h1 .thin{ font-weight:300; color:var(--ink-2); }
+  .lede{ font-size:clamp(16px,2.4vw,19px); color:var(--sub); margin:0 0 26px; max-width:46ch; }
+
+  /* Status pill */
+  .status{
+    display:flex; align-items:center; gap:12px;
+    border:1px solid var(--line); border-radius:16px;
+    padding:14px 16px; margin-bottom:20px; background:#fff;
+    transition:border-color .35s, background .35s;
+  }
+  .status .ic{
+    width:42px; height:42px; flex:none; border-radius:50%;
+    background:var(--soft); display:grid; place-items:center;
+    transition:background .35s;
+  }
+  .status strong{ display:block; font-size:16px; font-weight:600; line-height:1.45; }
+  .status span{ display:block; font-size:13.5px; color:var(--sub); line-height:1.55; }
+  body.aligned .status{ border-color:var(--green); background:var(--green-soft); }
+  body.aligned .status .ic{ background:var(--green); }
+  body.aligned .status .ic svg *{ stroke:#fff; }
+  body.aligned .status .ic svg path{ stroke:#fff; }
+
+  /* Buttons */
+  .cta-row{ display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
+  .btn{
+    border:none; border-radius:999px; padding:0 26px;
+    font-size:16px; font-weight:600; min-height:52px;
+    display:inline-flex; align-items:center; gap:9px;
+    transition:transform .15s, background .2s, opacity .2s;
+  }
+  .btn:active{ transform:scale(.97); }
+  .btn-primary{ background:var(--ink); color:#fff; }
+  .btn-primary:hover{ background:#222; }
+  .btn-ghost{ background:#fff; color:var(--ink); border:1px solid var(--line); }
+  .btn-ghost:hover{ background:var(--soft); }
+  .btn[disabled]{ opacity:.45; cursor:not-allowed; }
+  .hint{ font-size:12.5px; color:var(--sub); margin-top:12px; }
