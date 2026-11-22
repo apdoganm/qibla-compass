@@ -210,7 +210,7 @@
       navigator.geolocation.getCurrentPosition(function(pos){
         onPosition(pos);
       }, function(){ /* keep the decided unsupported message */ },
-      { enableHighAccuracy: true, timeout: 5000, maximumAge: 10000 });
+      { enableHighAccuracy: true, timeout: 3000, maximumAge: 10000 });
       startWatch();
       return;
     }
@@ -219,13 +219,13 @@
     // One explicit fix — this is the call that raises the permission prompt
     // on the very first activation. Afterwards the single watch below keeps
     // everything updated silently; no repeated prompts or requests.
-    // The 5 s timeout — matching the activation deadline — guarantees
+    // The 3 s timeout — matching the activation deadline — guarantees
     // the error callback fires, so this flow always lands in a decided
     // state (fix or onPositionError copy) and location can never
     // outlive the compass decision.
     navigator.geolocation.getCurrentPosition(function(pos){
       onPosition(pos);
       showToast('تم تحديد موقعك بنجاح');
-    }, onPositionError, { enableHighAccuracy: true, timeout: 5000, maximumAge: 10000 });
+    }, onPositionError, { enableHighAccuracy: true, timeout: 3000, maximumAge: 10000 });
     startWatch();
   }

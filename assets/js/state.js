@@ -51,7 +51,7 @@
     hasSensor: false,
     sensorSeen: false,
     unsupported: false,      // no usable direction sensor on this device (e.g. desktop)
-    activating: false,       // inside the 5 s activation-deadline window (pending, non-red)
+    activating: false,       // inside the 3 s activation-deadline window (pending, non-red)
     aligned: false,
     enabled: false,
     lastVibrate: 0,

@@ -60,7 +60,7 @@
 
      Activation deadline (user-specified): EVERY activation — the
      first tap and every retry — gets exactly ACTIVATION_DEADLINE_MS
-     (5 s), armed by startOrientation(). While the window runs, the
+     (3 s), armed by startOrientation(). While the window runs, the
      UI is in the pending state (enterActivating): locating copy in
      the NORMAL, non-red styling — red is reserved for the decided
      error. If a genuinely valid sample arrives in time,
@@ -71,17 +71,25 @@
      sensor API does not exist at all the wait is skipped: the error
      is decided immediately. Idempotent: re-entering simply
      re-asserts the copy and button. */
-  var ACTIVATION_DEADLINE_MS = 5000;
+  var ACTIVATION_DEADLINE_MS = 3000;
   var FILL_FAST_MS = 250;
   /* One clock, two consumers: a single rAF loop drives BOTH the
      activation button's loading fill (0 → 1 across exactly
-     ACTIVATION_DEADLINE_MS, linear) and the decision deadline
-     itself, timestamped from the same performance.now() readings —
-     the fill and the decision can never drift apart. The fill is
-     rendered as transform: scaleX() on a full-width layer (origin
-     at the right edge): composited by the GPU, so the sweep stays
-     butter-smooth — animating width instead forced layout + paint
-     every frame and visibly stuttered. */
+     ACTIVATION_DEADLINE_MS) and the decision deadline itself,
+     timestamped from the same performance.now() readings — the
+     fill and the decision can never drift apart. The DEADLINE is
+     computed from the raw linear progress; only the VISUAL fill
+     fraction is eased (easeVisual below), so the sweep glides
+     while the decision still lands at exactly the deadline. The
+     fill is rendered as transform: scaleX() on an over-wide layer
+     (origin at the right edge): composited by the GPU, so the
+     sweep stays butter-smooth — animating width instead forced
+     layout + paint every frame and visibly stuttered. */
+  function easeVisual(p){
+    // Gentle ease for the fill only: quick off the mark, settling
+    // softly into 1 — 1-(1-p)^1.4 maps 0→0 and 1→1 monotonically.
+    return 1 - Math.pow(1 - p, 1.4);
+  }
   var activationClock = null; // { start, rafId, progress, fastFrom, fastStart }
   var reducedMotion = (typeof window.matchMedia === 'function') &&
     window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -115,10 +123,11 @@
       var p;
       if (clock.fastFrom >= 0){
         // Early success: sweep the remaining fill home in ~250 ms,
-        // then show the live state — nobody waits the full 5 s for a
-        // compass that already works.
+        // then show the live state — nobody waits the full 3 s for a
+        // compass that already works. The fast sweep eases into 1
+        // with the same curve as the main fill.
         var fp = Math.min(1, (now - clock.fastStart) / FILL_FAST_MS);
-        p = clock.fastFrom + (1 - clock.fastFrom) * fp;
+        p = clock.fastFrom + (1 - clock.fastFrom) * easeVisual(fp);
         clock.progress = p;
         setBtnFill(p);
         if (fp >= 1){
@@ -128,11 +137,12 @@
           return;
         }
       } else {
-        p = Math.min(1, (now - clock.start) / ACTIVATION_DEADLINE_MS);
+        var raw = Math.min(1, (now - clock.start) / ACTIVATION_DEADLINE_MS);
+        p = easeVisual(raw); // visual fraction only — deadline below uses raw
         if (reducedMotion) p = Math.ceil(p * 10) / 10; // coarse steps only
         clock.progress = p;
         setBtnFill(p);
-        if (p >= 1){
+        if (raw >= 1){
           // Deadline: the decision lands in the same frame the fill
           // completes — red error + enabled retry, atomically.
           activationClock = null;
@@ -205,7 +215,7 @@
       window.addEventListener('deviceorientation', function(e){ onOrientation(e, e.absolute === true); }, true);
     }
     if (typeof DeviceOrientationEvent === 'undefined'){
-      // Known-absent sensor API: skip the 5 s wait entirely — and no
+      // Known-absent sensor API: skip the 3 s wait entirely — and no
       // fake fill for a failure that is already known.
       enterUnsupported();
       return;

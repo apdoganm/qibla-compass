@@ -7,7 +7,7 @@
 
   enableBtn.addEventListener('click', function(){
     // One activation contract for the first tap AND every retry (see
-    // orientation.js): a 5-second deadline, a pending window in the
+    // orientation.js): a 3-second deadline, a pending window in the
     // normal non-red styling, and an atomic flip to the red error
     // state if no real heading sample arrives in time. When the
     // sensor API is known-absent the wait is skipped entirely.
@@ -24,7 +24,7 @@
     requestLocation();
     if (typeof DeviceOrientationEvent.requestPermission === 'function'){
       DeviceOrientationEvent.requestPermission().then(function(res){
-        if (res === 'granted'){ startOrientation(); } // arms the 5 s deadline
+        if (res === 'granted'){ startOrientation(); } // arms the 3 s deadline
         else {
           state.activating = false;
           endButtonLoading();
@@ -38,7 +38,7 @@
         showToast('تعذّر طلب إذن الحركة — أعد المحاولة');
       });
     } else {
-      startOrientation();   // arms the 5 s deadline
+      startOrientation();   // arms the 3 s deadline
     }
   });
   locateBtn.addEventListener('click', requestLocation);
@@ -100,7 +100,7 @@
      ALL writes. Previously tick() rewrote the dial transform, hub
      texts and the whole strip 60×/s forever, and that constant
      main-thread churn competed with the activation button's fill
-     animation during the 5 s window. The dial transform and the
+     animation during the 3 s window. The dial transform and the
      calibration pill are likewise written only when they change. */
   var lastCalibShown = null, lastDialH = null, lastIdleKey = null;
   function tick(){

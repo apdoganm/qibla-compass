@@ -3,12 +3,12 @@
    Imports every partial in the ORIGINAL cascade order of the
    former single-file build. responsive.css must stay last.
    ============================================================ */
-@import url("tokens.css?v=7");
-@import url("base.css?v=7");
-@import url("layout.css?v=7");
-@import url("hero.css?v=7");
-@import url("compass.css?v=7");
-@import url("strip.css?v=7");
-@import url("cards.css?v=7");
-@import url("sections.css?v=7");
-@import url("responsive.css?v=7");
+@import url("tokens.css?v=8");
+@import url("base.css?v=8");
+@import url("layout.css?v=8");
+@import url("hero.css?v=8");
+@import url("compass.css?v=8");
+@import url("strip.css?v=8");
+@import url("cards.css?v=8");
+@import url("sections.css?v=8");
+@import url("responsive.css?v=8");

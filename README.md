@@ -53,17 +53,19 @@ design, copy and styling are unchanged — the code is only split into files.
   real heading sample arriving later clears the state automatically.
   (iOS motion-permission denial keeps its own separate message.)
   Every activation — first tap and every retry — runs against a
-  5-second deadline: while it runs, the status card shows the
+  3-second deadline: while it runs, the status card shows the
   locating copy in the normal (non-red) styling and the activation
   button shows a loading fill (grey base, black fill sweeping from
-  the right as a GPU-composited `scaleX()` transform) driven by the
-  same rAF clock as the deadline itself. The render loop memoises
+  the right as a GPU-composited `scaleX()` transform, its leading
+  edge feathered by a 72px gradient to transparent and its motion
+  gently eased) driven by the same rAF clock as the deadline
+  itself. The render loop memoises
   its idle frames, so nothing competes with that sweep.
   A valid sample inside the window fast-completes the fill (~250 ms)
   and the compass goes live; if the deadline expires first, the card
   flips to the red error message with an enabled retry button in the
   same frame. With no sensor API the wait is skipped and the error
-  is immediate (no fill). Geolocation requests carry a matching 5 s
+  is immediate (no fill). Geolocation requests carry a matching 3 s
   timeout whose error path lands on decided copy, and while the
   error state is shown, location refreshes run silently so no
   «جارٍ تحديد موقعك…» text is ever layered under the red card.

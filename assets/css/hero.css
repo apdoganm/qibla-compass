@@ -84,20 +84,29 @@
   .btn-ghost{ background:#fff; color:var(--ink); border:1px solid var(--line); }
   .btn-ghost:hover{ background:var(--soft); }
   .btn[disabled]{ opacity:.45; cursor:not-allowed; }
-  /* Activation loading fill (driven by the SAME rAF clock as the 5 s
+  /* Activation loading fill (driven by the SAME rAF clock as the 3 s
      decision deadline in orientation.js — never a CSS transition):
      the base turns grey, then a black fill anchored to the RIGHT
-     edge sweeps left until it covers the whole button at t=5 s.
-     The fill is a full-width layer animated ONLY by transform:
+     edge sweeps left until it covers the whole button at t=3 s.
+     The fill is an over-wide layer animated ONLY by transform:
      scaleX() (GPU-composited, no layout/paint thrash — animating
      width instead made the sweep visibly stutter). transform-origin
      is the right edge, so scaleX(p) grows the black from the right.
+     Soft leading edge (user-specified — no harsh dividing line):
+     the layer is 72px WIDER than the button and carries a gradient
+     that is solid ink from the right edge up to calc(100% - 72px),
+     then feathers to fully transparent at its left tip. The feather
+     is the visible leading edge while sweeping; at p=1 the solid
+     region spans exactly the button's width and the feather parks
+     OUTSIDE the button's left edge (clipped by overflow:hidden),
+     so the completed state is fully, evenly black.
      The label sits above both zones in white + difference blending:
      over the light grey it renders near-black, over the black fill
      it renders white — readable (≥4.5:1) at every fill fraction. */
   .btn-fill{
-    position:absolute; top:0; bottom:0; right:0; width:100%;
-    background:var(--ink); display:none; pointer-events:none;
+    position:absolute; top:0; bottom:0; right:0; width:calc(100% + 72px);
+    background:linear-gradient(to left, var(--ink) 0, var(--ink) calc(100% - 72px), rgba(0,0,0,0) 100%);
+    display:none; pointer-events:none;
     transform:scaleX(0); transform-origin:right center;
     will-change:transform;
   }
