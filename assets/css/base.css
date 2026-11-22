@@ -13,7 +13,7 @@
   }
   button{ font-family:inherit; cursor:pointer; min-height:48px; touch-action:manipulation; }
   .wrap{
-    max-width:1120px; margin:0 auto; padding:0 clamp(14px, 4.5vw, 20px);
+    max-width:1200px; margin:0 auto; padding:0 clamp(14px, 4.5vw, 20px);
     /* notched phones in landscape: keep content clear of the sensor housing */
     padding-left:max(clamp(14px, 4.5vw, 20px), env(safe-area-inset-left, 0px));
     padding-right:max(clamp(14px, 4.5vw, 20px), env(safe-area-inset-right, 0px));

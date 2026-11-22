@@ -14,6 +14,11 @@ design, copy and styling are unchanged — the code is only split into files.
 - Live compass dial with a Kaaba marker at the true Qibla bearing, and a
   second display mode: a wide direction strip whose arrows thin out as you
   approach alignment.
+- The hero fills the entire first viewport (top bar + hero), so the data
+  cards below it appear only after scrolling. The dial is sized by a
+  single width-and-height-aware expression (`--dial-size`, capped at
+  560px) and is a perfect circle at every size: when the viewport
+  height constrains, the circle shrinks — it never squashes.
 - Alignment state at ±5° (6.5° exit hysteresis): the UI turns green and the
   phone vibrates (`[70, 50, 70]`) on alignment.
 - Heading pipeline: tilt-compensated azimuth, One Euro adaptive filter
@@ -41,12 +46,28 @@ design, copy and styling are unchanged — the code is only split into files.
   distance, coordinates, declination) still populates normally, and a
   real heading sample arriving later clears the state automatically.
   (iOS motion-permission denial keeps its own separate message.)
+  Every activation — first tap and every retry — runs against a
+  5-second deadline: while it runs, the status card shows the
+  locating copy in the normal (non-red) styling and the activation
+  button shows a loading fill (grey base, black fill sweeping from
+  the right) driven by the same rAF clock as the deadline itself.
+  A valid sample inside the window fast-completes the fill (~250 ms)
+  and the compass goes live; if the deadline expires first, the card
+  flips to the red error message with an enabled retry button in the
+  same frame. With no sensor API the wait is skipped and the error
+  is immediate (no fill). Geolocation requests carry a matching 5 s
+  timeout whose error path lands on decided copy, and while the
+  error state is shown, location refreshes run silently so no
+  «جارٍ تحديد موقعك…» text is ever layered under the red card.
+  In this state the dial hub shows a single short red line
+  («الاتجاه غير مدعوم») under a warning glyph, and the dial's scale
+  is dimmed while the Qibla line and Kaaba marker stay full-strength.
 - Device-type awareness: the site detects whether the visitor is on a
   phone, a tablet or a computer (classic UA parsing, with the iPadOS
   Macintosh-UA + multi-touch case read as a tablet and Windows touch
   laptops kept as computers; UA Client Hints refine the result
-  asynchronously when available). A neutral chip in the top bar shows
-  «تتصفح من: هاتف / جهاز لوحي / كمبيوتر», and every string that names
+  asynchronously when available). Detection is silent — there is no
+  visible device indicator — and every string that names
   the visitor's device adapts to it — «حرّك هاتفك» on a phone,
   «حرّك جهازك اللوحي» on a tablet, «حرّك كمبيوترك» on a computer —
   via the `{device}` / `{deviceBare}` tokens that `device.js` fills

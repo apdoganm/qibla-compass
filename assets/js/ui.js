@@ -29,7 +29,7 @@
     if (!hasHeading){
       strip.className = 'strip idle';
       stripDeg.textContent = '—°';
-      if (state.unsupported){
+      if (state.unsupported && !state.activating){
         stripGuide.textContent = 'هذا الجهاز لا يدعم تحديد الاتجاه';
         stripSub.textContent = 'افتح نفس الرابط من هاتفك لمعرفة اتجاهك لحظياً';
       } else {

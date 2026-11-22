@@ -18,6 +18,8 @@
   var turnText = document.getElementById('turnText');
   var turnArrow = document.getElementById('turnArrow');
   var enableBtn = document.getElementById('enableBtn');
+  var btnFill = document.getElementById('btnFill');
+  var btnText = document.getElementById('btnText');
   var locateBtn = document.getElementById('locateBtn');
   var placeText = document.getElementById('placeText');
   var toast = document.getElementById('toast');
@@ -49,6 +51,7 @@
     hasSensor: false,
     sensorSeen: false,
     unsupported: false,      // no usable direction sensor on this device (e.g. desktop)
+    activating: false,       // inside the 5 s activation-deadline window (pending, non-red)
     aligned: false,
     enabled: false,
     lastVibrate: 0,

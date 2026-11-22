@@ -27,7 +27,10 @@
   body.aligned .top-pointer{ border-top-color:var(--green); }
 
   .dial{
-    position:absolute; inset:0; border-radius:50%;
+    /* the wrap is square (aspect-ratio above) and the dial fills it
+       exactly — width == height by construction, in every state */
+    position:absolute; inset:0; width:100%; height:100%; aspect-ratio:1/1;
+    border-radius:50%;
     background:
       radial-gradient(circle at 50% 42%, #ffffff 0%, #fdfdfd 55%, #f7f7f7 100%);
     border:1px solid var(--line);
@@ -82,7 +85,7 @@
   .kaaba-marker{
     position:absolute; left:50%; top:clamp(10px, 3.2vw, 14px);
     transform:translateX(-50%);
-    width:clamp(46px, 13vw, 56px); height:clamp(46px, 13vw, 56px); border-radius:50%;
+    width:clamp(46px, 13vw, 56px); height:clamp(46px, 13vw, 56px); aspect-ratio:1/1; flex:none; border-radius:50%;
     background:#fff; border:1px solid var(--line);
     box-shadow:0 6px 18px rgba(0,0,0,.14);
     display:grid; place-items:center;
@@ -100,11 +103,15 @@
   }
   body.aligned .kaaba-marker .deg{ color:var(--green-dark); }
 
-  /* Center hub */
+  /* Center hub — always a circle, and capped at ~34% of the dial
+     (38% in the unsupported state, whose content is a single short
+     line) so it can never grow over the cardinal labels: at the
+     smallest dial (275px) the شرق/غرب labels' inner edges sit ~67px
+     from centre, well outside the hub's ~52px radius. */
   .hub{
     position:absolute; left:50%; top:50%; z-index:5;
     transform:translate(-50%,-50%);
-    width:34%; min-width:98px; max-width:136px; aspect-ratio:1/1; border-radius:50%;
+    width:min(34%, 136px); min-width:92px; aspect-ratio:1/1; border-radius:50%; flex:none;
     background:#fff; border:1px solid var(--line);
     box-shadow:0 10px 30px rgba(0,0,0,.09), inset 0 1px 0 #fff;
     display:flex; flex-direction:column; align-items:center; justify-content:center;
@@ -112,8 +119,22 @@
     transition:border-color .35s;
   }
   body.aligned .hub{ border-color:var(--green); }
-  body.unsupported .hub{ border-color:var(--red-line); }
-  body.unsupported .hub .diff{ color:var(--red); }
+  /* Unsupported hub: glyph + one short red line only (the .lbl device
+     line is hidden — app.js also swaps the big «—°» for the glyph) */
+  body.unsupported .hub{ border-color:var(--red-line); width:min(38%, 140px); padding:10px; }
+  body.unsupported .hub .lbl{ display:none; }
+  body.unsupported .hub .big.warn{
+    font-size:30px; line-height:1; color:var(--red);
+    font-variant-numeric:normal; direction:rtl;
+  }
+  body.unsupported .hub .diff{ color:var(--red); font-size:12.5px; margin-top:5px; line-height:1.4; }
+  /* Unsupported dial: de-emphasise the measuring scale (ticks,
+     numbers, cardinals) — the qibla line and Kaaba marker stay at
+     full strength because the angle itself is still valid */
+  body.unsupported .tick{ opacity:.35; }
+  body.unsupported .tick.major{ opacity:.5; }
+  body.unsupported .tick-num{ opacity:.45; }
+  body.unsupported .cardinal{ opacity:.55; }
   .hub .big{
     font-size:clamp(21px, 6.2vw, 34px); font-weight:700; line-height:1.1;
     font-variant-numeric:tabular-nums; direction:ltr;

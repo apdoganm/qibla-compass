@@ -1,10 +1,11 @@
 /* ============================================================
    اتجاه القبلة — device.js
    Device-type awareness: detects whether the visitor is on a
-   phone, a tablet or a computer, shows it in a top-bar chip,
-   and adapts every device-naming string to match — the site
-   says «حرّك هاتفك» on a phone, «حرّك جهازك اللوحي» on a
-   tablet and «حرّك كمبيوترك» on a computer.
+   phone, a tablet or a computer, and adapts every device-naming
+   string to match — the site says «حرّك هاتفك» on a phone,
+   «حرّك جهازك اللوحي» on a tablet and «حرّك كمبيوترك» on a
+   computer. (Detection is silent: there is no visible chip —
+   only the wording adapts.)
 
    Other scripts compose device strings with the tokens
    {device} (possessive noun: هاتفك / جهازك اللوحي / كمبيوترك)
@@ -17,9 +18,9 @@
 
   var QiblaDevice = (function(){
     var WORDS = {
-      phone:    { noun: 'هاتفك',       bare: 'هاتف',      label: 'هاتف' },
-      tablet:   { noun: 'جهازك اللوحي', bare: 'جهاز لوحي', label: 'جهاز لوحي' },
-      computer: { noun: 'كمبيوترك',    bare: 'كمبيوتر',   label: 'كمبيوتر' }
+      phone:    { noun: 'هاتفك',       bare: 'هاتف' },
+      tablet:   { noun: 'جهازك اللوحي', bare: 'جهاز لوحي' },
+      computer: { noun: 'كمبيوترك',    bare: 'كمبيوتر' }
     };
 
     /* ---------- Detection ----------
@@ -46,11 +47,11 @@
 
     var current = {
       type: detectType(),
-      noun: '', bare: '', label: ''
+      noun: '', bare: ''
     };
     function applyWords(){
       var w = WORDS[current.type];
-      current.noun = w.noun; current.bare = w.bare; current.label = w.label;
+      current.noun = w.noun; current.bare = w.bare;
     }
     applyWords();
 
@@ -85,19 +86,13 @@
         tokenNodes[i].node.nodeValue = fill(tokenNodes[i].original);
       }
     }
-    function updateChip(){
-      var el = document.getElementById('deviceLabel');
-      if (el) el.textContent = 'تتصفح من: ' + current.label;
-    }
     function refresh(){
       applyWords();
       fillStatic();
-      updateChip();
     }
 
     collectTokenNodes(document.body);
     fillStatic();
-    updateChip();
 
     /* ---------- UA Client Hints refinement (async, optional) ----------
        getHighEntropyValues is never awaited: the UA result above
@@ -124,7 +119,6 @@
       get type(){ return current.type; },
       get noun(){ return current.noun; },
       get bare(){ return current.bare; },
-      get label(){ return current.label; },
       fill: fill,
       detectType: detectType
     };

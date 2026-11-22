@@ -11,9 +11,16 @@
     // This keeps the whole ring exactly concentric with the dial at any size.
     function layout(){
       var size = dial.clientWidth || 360;
+      // Small dials (short-landscape phones, < 260px): the fixed
+      // ring offsets would push the cardinal labels underneath the
+      // centre hub and crowd the number ring into them. Switch to a
+      // proportional cardinal radius and drop the (decorative)
+      // number ring, so the hub — capped at ~38% of the dial —
+      // always clears the labels.
+      var small = size < 260;
       var rTick = size/2 - 15;
       var rNum  = size/2 - 33;
-      var rCard = size/2 - 57;
+      var rCard = small ? size * 0.31 : size/2 - 57;
       dial.querySelectorAll('.tick').forEach(function(t){
         var a = parseFloat(t.getAttribute('data-a'));
         t.style.left = '50%'; t.style.top = '50%';
@@ -21,6 +28,7 @@
       });
       dial.querySelectorAll('.tick-num').forEach(function(n){
         var a = parseFloat(n.getAttribute('data-a'));
+        n.style.display = small ? 'none' : '';
         n.style.left = '50%'; n.style.top = '50%';
         n.style.transform = 'translate(-50%,-50%) rotate(' + a + 'deg) translateY(' + (-rNum) + 'px) rotate(' + (-a) + 'deg)';
       });

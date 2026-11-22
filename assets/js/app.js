@@ -6,19 +6,30 @@
 "use strict";
 
   enableBtn.addEventListener('click', function(){
+    // One activation contract for the first tap AND every retry (see
+    // orientation.js): a 5-second deadline, a pending window in the
+    // normal non-red styling, and an atomic flip to the red error
+    // state if no real heading sample arrives in time. When the
+    // sensor API is known-absent the wait is skipped entirely.
     state.enabled = true;
-    // Mark the button activated BEFORE starting the sensor/location
-    // flow: on an unsupported device enterUnsupported() runs inside
-    // startOrientation() and must be able to override this state with
-    // its retry wording instead of being overwritten by it.
-    enableBtn.textContent = 'البوصلة مفعّلة';
-    enableBtn.setAttribute('disabled', 'disabled');
+    if (typeof DeviceOrientationEvent === 'undefined'){
+      startOrientation();   // → enterUnsupported() synchronously
+      requestLocation();    // silent branch: the decision is already made
+      return;
+    }
+    enterActivating();
+    // requestLocation runs while state.unsupported may still be set
+    // (retry): its silent branch then avoids overwriting the pending
+    // copy, while its fix still refreshes the data cards.
     requestLocation();
-    if (typeof DeviceOrientationEvent !== 'undefined' &&
-        typeof DeviceOrientationEvent.requestPermission === 'function'){
+    if (typeof DeviceOrientationEvent.requestPermission === 'function'){
       DeviceOrientationEvent.requestPermission().then(function(res){
-        if (res === 'granted'){ startOrientation(); }
+        if (res === 'granted'){ startOrientation(); } // arms the 5 s deadline
         else {
+          state.activating = false;
+          endButtonLoading();
+          enableBtn.removeAttribute('disabled');
+          btnText.textContent = 'تفعيل البوصلة والموقع';
           showToast('يلزم إذن الحركة لعمل البوصلة');
           statusTitle.textContent = 'إذن الحركة متوقف';
           statusDesc.textContent = 'فعّل إذن الحركة من إعدادات المتصفح لهذا الموقع، ثم أعد تحميل الصفحة واضغط زر التفعيل من جديد.';
@@ -27,7 +38,7 @@
         showToast('تعذّر طلب إذن الحركة — أعد المحاولة');
       });
     } else {
-      startOrientation();
+      startOrientation();   // arms the 5 s deadline
     }
   });
   locateBtn.addEventListener('click', requestLocation);
@@ -94,8 +105,18 @@
     var h = norm360(state.displayHeading + state.declination);
     dial.style.transform = 'rotate(' + (-h) + 'deg)';
     if (!hasHeading){
-      hubHeading.textContent = '—°';
-      hubDiff.textContent = state.unsupported ? 'الاتجاه غير مدعوم هنا' : 'بانتظار التفعيل';
+      if (state.unsupported && !state.activating){
+        // Unsupported hub: one warning glyph + ONE short red line.
+        // No «—°» reading, no device label — nothing can cramp or
+        // overflow the hub in this state (see compass.css).
+        hubHeading.textContent = '⚠︎';
+        hubHeading.className = 'big warn';
+        hubDiff.textContent = 'الاتجاه غير مدعوم';
+      } else {
+        hubHeading.textContent = '—°';
+        hubHeading.className = 'big';
+        hubDiff.textContent = 'بانتظار التفعيل';
+      }
       hubDiff.className = 'diff';
       dAlign.textContent = '—';
       dAlignSub.textContent = 'الاصطفاف الدقيق ضمن ±٥°';
@@ -104,6 +125,7 @@
       return;
     }
     hubHeading.textContent = fmt(h, 0) + '°';
+    hubHeading.className = 'big';
 
     if (state.qibla !== null){
       var diff = angDiff(h, state.qibla);

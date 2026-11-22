@@ -199,14 +199,33 @@
       showToast('جهازك لا يدعم تحديد الموقع');
       return;
     }
+    if (state.unsupported){
+      // While the unsupported-sensor decision is on screen, a location
+      // refresh must never bury it under a «جارٍ تحديد موقعك…» loading
+      // text — that exact pairing (red card + eternal spinner) is the
+      // stuck state users reported. Refresh the (still valid) angle /
+      // distance data silently instead; onPosition already refrains
+      // from overwriting the message, and an error here changes
+      // nothing about the sensor decision.
+      navigator.geolocation.getCurrentPosition(function(pos){
+        onPosition(pos);
+      }, function(){ /* keep the decided unsupported message */ },
+      { enableHighAccuracy: true, timeout: 5000, maximumAge: 10000 });
+      startWatch();
+      return;
+    }
     statusTitle.textContent = 'جارٍ تحديد موقعك…';
     statusDesc.textContent = 'لحظات ونحسب زاوية القبلة من مكانك الحالي.';
     // One explicit fix — this is the call that raises the permission prompt
     // on the very first activation. Afterwards the single watch below keeps
     // everything updated silently; no repeated prompts or requests.
+    // The 5 s timeout — matching the activation deadline — guarantees
+    // the error callback fires, so this flow always lands in a decided
+    // state (fix or onPositionError copy) and location can never
+    // outlive the compass decision.
     navigator.geolocation.getCurrentPosition(function(pos){
       onPosition(pos);
       showToast('تم تحديد موقعك بنجاح');
-    }, onPositionError, { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 });
+    }, onPositionError, { enableHighAccuracy: true, timeout: 5000, maximumAge: 10000 });
     startWatch();
   }

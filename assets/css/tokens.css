@@ -16,6 +16,13 @@
     --red-soft:#fef3f2;
     --red-line:#f5c6c2;
     --gold:#c9a227;
+    --btn-loading-bg:#dedede;   /* activation button base while its 5 s fill sweeps */
     --radius:20px;
-    --dial-size:min(86vw, 400px);
+    /* Dial diameter: ONE expression, width- AND height-aware, so the
+       compass is always a perfect circle — when the viewport height
+       is the constraint the circle shrinks, it never squashes.
+       vh line first (universal fallback), svh line enhances it
+       (svh = the small/stable viewport height on mobile browsers). */
+    --dial-size:min(88vw, 560px, 76vh);
+    --dial-size:min(88vw, 560px, 76svh);
   }

@@ -37,7 +37,7 @@
     }
     if (isAbs || compassGrade) state.absGradeSeen = true;
     if (!state.firstEventAt) state.firstEventAt = now;
-    if (state.unsupported) clearUnsupported();
+    if (state.unsupported || state.activating) clearUnsupported();
     state.sensorSeen = true;
     state.hasSensor = true;
     state.targetHeading = norm360(h);
@@ -51,15 +51,115 @@
      have no magnetic compass, so no heading can ever arrive. Say that
      plainly instead of pretending the compass is live and waiting for
      movement. Entered when DeviceOrientationEvent does not exist at
-     all, or when the watchdog sees no valid heading sample within
-     4 s of activation (the classic desktop-Chrome case: the listener
+     all, or when the activation deadline expires with no valid
+     heading sample (the classic desktop-Chrome case: the listener
      registers but alpha stays null forever). A valid sample arriving
      later clears the state automatically via clearUnsupported().
      The iOS permission-denied message is a separate state and is
-     never merged into this one. */
+     never merged into this one.
+
+     Activation deadline (user-specified): EVERY activation — the
+     first tap and every retry — gets exactly ACTIVATION_DEADLINE_MS
+     (5 s), armed by startOrientation(). While the window runs, the
+     UI is in the pending state (enterActivating): locating copy in
+     the NORMAL, non-red styling — red is reserved for the decided
+     error. If a genuinely valid sample arrives in time,
+     clearUnsupported() cancels the deadline and the compass is
+     live. If the deadline expires first, enterUnsupported() flips
+     the card to red + error message + enabled retry button as one
+     atomic decision. There is no path that loads forever. When the
+     sensor API does not exist at all the wait is skipped: the error
+     is decided immediately. Idempotent: re-entering simply
+     re-asserts the copy and button. */
+  var ACTIVATION_DEADLINE_MS = 5000;
+  var FILL_FAST_MS = 250;
+  /* One clock, two consumers: a single rAF loop drives BOTH the
+     activation button's loading fill (0% → 100% across exactly
+     ACTIVATION_DEADLINE_MS, linear) and the decision deadline
+     itself, timestamped from the same performance.now() readings —
+     the fill and the decision can never drift apart. */
+  var activationClock = null; // { start, rafId, progress, fastFrom, fastStart }
+  var reducedMotion = (typeof window.matchMedia === 'function') &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function setBtnFill(p){
+    btnFill.style.width = (p * 100).toFixed(1) + '%';
+  }
+  function endButtonLoading(){
+    enableBtn.classList.remove('loading');
+    enableBtn.removeAttribute('aria-busy');
+    setBtnFill(0);
+  }
+  function stopActivationClock(){
+    if (activationClock){
+      cancelAnimationFrame(activationClock.rafId);
+      activationClock = null;
+      endButtonLoading();
+    }
+    // No clock running → the button was never in the loading state;
+    // touch nothing (a known-absent sensor must see zero fill writes).
+  }
+  function startActivationClock(){
+    stopActivationClock();
+    var clock = { start: performance.now(), rafId: 0, progress: 0, fastFrom: -1, fastStart: 0 };
+    activationClock = clock;
+    enableBtn.classList.add('loading');
+    enableBtn.setAttribute('aria-busy', 'true');
+    setBtnFill(0);
+    var step = function(){
+      if (activationClock !== clock) return; // cancelled or superseded
+      var now = performance.now();
+      var p;
+      if (clock.fastFrom >= 0){
+        // Early success: sweep the remaining fill home in ~250 ms,
+        // then show the live state — nobody waits the full 5 s for a
+        // compass that already works.
+        var fp = Math.min(1, (now - clock.fastStart) / FILL_FAST_MS);
+        p = clock.fastFrom + (1 - clock.fastFrom) * fp;
+        clock.progress = p;
+        setBtnFill(p);
+        if (fp >= 1){
+          activationClock = null;
+          endButtonLoading();
+          applyCompassLive();
+          return;
+        }
+      } else {
+        p = Math.min(1, (now - clock.start) / ACTIVATION_DEADLINE_MS);
+        if (reducedMotion) p = Math.ceil(p * 10) / 10; // coarse steps only
+        clock.progress = p;
+        setBtnFill(p);
+        if (p >= 1){
+          // Deadline: the decision lands in the same frame the fill
+          // completes — red error + enabled retry, atomically.
+          activationClock = null;
+          endButtonLoading();
+          state.activating = false;
+          if (!state.sensorSeen) enterUnsupported();
+          return;
+        }
+      }
+      clock.rafId = requestAnimationFrame(step);
+    };
+    clock.rafId = requestAnimationFrame(step);
+  }
+  function enterActivating(){
+    // Pending window: normal styling, locating copy. On a retry this
+    // deliberately replaces the red error visuals — the decision is
+    // re-opened for at most ACTIVATION_DEADLINE_MS.
+    state.activating = true;
+    document.body.classList.remove('unsupported');
+    liveDot.classList.remove('on');
+    liveText.textContent = 'جارٍ تفعيل البوصلة…';
+    statusTitle.textContent = 'جارٍ تحديد موقعك…';
+    statusDesc.textContent = 'لحظات ونحسب زاوية القبلة من مكانك الحالي.';
+    enableBtn.setAttribute('disabled', 'disabled');
+    btnText.textContent = 'جارٍ التفعيل…';
+  }
   function enterUnsupported(){
-    if (state.sensorSeen || state.unsupported) return;
+    if (state.sensorSeen) return;
     state.unsupported = true;
+    state.activating = false;
+    stopActivationClock();
     document.body.classList.add('unsupported');
     liveDot.classList.remove('on');
     liveText.textContent = 'تحديد الاتجاه غير مدعوم على هذا الجهاز';
@@ -68,12 +168,25 @@
     // Honest button state: not stuck on a disabled «البوصلة مفعّلة» —
     // it offers a retry (e.g. after connecting/enabling a sensor).
     enableBtn.removeAttribute('disabled');
-    enableBtn.textContent = 'إعادة محاولة التفعيل';
+    btnText.textContent = 'إعادة محاولة التفعيل';
   }
   function clearUnsupported(){
+    if (activationClock){
+      if (activationClock.fastFrom < 0){
+        // A valid sample inside the deadline window: fast-complete
+        // the fill (~250 ms); applyCompassLive() runs when it lands.
+        activationClock.fastFrom = activationClock.progress;
+        activationClock.fastStart = performance.now();
+      }
+      return; // fast-complete already in flight on a second sample
+    }
+    applyCompassLive();
+  }
+  function applyCompassLive(){
     state.unsupported = false;
+    state.activating = false;
     document.body.classList.remove('unsupported');
-    enableBtn.textContent = 'البوصلة مفعّلة';
+    btnText.textContent = 'البوصلة مفعّلة';
     enableBtn.setAttribute('disabled', 'disabled');
     if (state.qibla !== null){
       statusTitle.textContent = QiblaDevice.fill('تم تحديد موقعك — حرّك {device}');
@@ -81,7 +194,6 @@
     }
   }
   var orientationStarted = false;
-  var headingWatchdog = null;
   function startOrientation(){
     if (!orientationStarted){
       orientationStarted = true;
@@ -89,12 +201,10 @@
       window.addEventListener('deviceorientation', function(e){ onOrientation(e, e.absolute === true); }, true);
     }
     if (typeof DeviceOrientationEvent === 'undefined'){
+      // Known-absent sensor API: skip the 5 s wait entirely — and no
+      // fake fill for a failure that is already known.
       enterUnsupported();
       return;
     }
-    if (headingWatchdog) clearTimeout(headingWatchdog);
-    headingWatchdog = setTimeout(function(){
-      headingWatchdog = null;
-      if (!state.sensorSeen) enterUnsupported();
-    }, 4000);
+    startActivationClock();
   }

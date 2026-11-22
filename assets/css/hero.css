@@ -5,9 +5,22 @@
   .hero{
     display:grid; grid-template-columns:1fr; gap:8px;
     padding:18px 0 8px;
+    /* Full first screen: topbar + hero together fill the first
+       viewport, so the data cards begin strictly below the fold and
+       appear only after scrolling. min-height (never fixed height):
+       on short screens the hero simply grows and the page scrolls —
+       nothing is ever clipped. The 52px offset is the minimum real
+       topbar height, so topbar + hero >= 100svh at every width and
+       zero pixels of the next section can peek into the first paint.
+       vh first, svh enhancement (stable on mobile URL-bar show/hide). */
+    min-height:calc(100vh - 52px);
+    min-height:calc(100svh - 52px);
+    align-content:center;
   }
-  @media (min-width:960px){
-    .hero{ grid-template-columns:1.05fr .95fr; gap:56px; align-items:center; padding:34px 0 10px; }
+  @media (min-width:1080px){
+    /* two columns only where the enlarged dial truly fits beside the
+       text; below this width the layout stacks instead of squeezing */
+    .hero{ grid-template-columns:.92fr 1.08fr; gap:48px; align-items:center; padding:34px 0 10px; }
   }
   h1{
     font-size:clamp(38px, 6.4vw, 58px);
@@ -47,6 +60,7 @@
     font-size:16px; font-weight:600; min-height:52px;
     display:inline-flex; align-items:center; gap:9px;
     transition:transform .15s, background .2s, opacity .2s;
+    position:relative; overflow:hidden;
   }
   .btn:active{ transform:scale(.97); }
   .btn-primary{ background:var(--ink); color:#fff; }
@@ -54,4 +68,22 @@
   .btn-ghost{ background:#fff; color:var(--ink); border:1px solid var(--line); }
   .btn-ghost:hover{ background:var(--soft); }
   .btn[disabled]{ opacity:.45; cursor:not-allowed; }
+  /* Activation loading fill (driven by the SAME rAF clock as the 5 s
+     decision deadline in orientation.js — never a CSS transition):
+     the base turns grey, then a black fill anchored to the RIGHT
+     edge sweeps left until it covers the whole button at t=5 s.
+     The label sits above both zones in white + difference blending:
+     over the light grey it renders near-black, over the black fill
+     it renders white — readable (≥4.5:1) at every fill fraction. */
+  .btn-fill{
+    position:absolute; top:0; bottom:0; right:0; width:0%;
+    background:var(--ink); display:none; pointer-events:none;
+  }
+  .btn.loading{ background:var(--btn-loading-bg); opacity:1; }
+  .btn.loading .btn-fill{ display:block; }
+  .btn-label{
+    position:relative; z-index:1;
+    display:inline-flex; align-items:center; gap:9px;
+  }
+  .btn.loading .btn-label{ color:#fff; mix-blend-mode:difference; }
   .hint{ font-size:12.5px; color:var(--sub); margin-top:12px; }

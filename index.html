@@ -26,7 +26,6 @@
       <span id="placeText">مكة المكرمة — الكعبة المشرفة</span>
     </div>
     <div class="live-dot" id="liveDot"><i></i><span id="liveText">البوصلة غير مفعّلة</span></div>
-    <div class="device-chip" id="deviceChip"><span id="deviceLabel">تتصفح من: —</span></div>
   </header>
 
   <main>
@@ -48,8 +47,11 @@
 
       <div class="cta-row">
         <button class="btn btn-primary" id="enableBtn">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="#fff" stroke-width="2"/><path d="M15.5 8.5 13 13l-4.5 2.5L11 11l4.5-2.5Z" fill="#fff"/></svg>
-          تفعيل البوصلة والموقع
+          <span class="btn-fill" id="btnFill" aria-hidden="true"></span>
+          <span class="btn-label">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="#fff" stroke-width="2"/><path d="M15.5 8.5 13 13l-4.5 2.5L11 11l4.5-2.5Z" fill="#fff"/></svg>
+            <span id="btnText">تفعيل البوصلة والموقع</span>
+          </span>
         </button>
         <button class="btn btn-ghost" id="locateBtn">تحديث موقعي</button>
       </div>
