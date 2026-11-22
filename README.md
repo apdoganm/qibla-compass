@@ -55,16 +55,17 @@ design, copy and styling are unchanged — the code is only split into files.
   Every activation — first tap and every retry — runs against a
   3-second deadline: while it runs, the status card shows the
   locating copy in the normal (non-red) styling and the activation
-  button pulses (وميض — a sonar ring expanding from its edge and
-  fading out while its black background breathes gently; a pure-CSS
-  animation toggled by the same rAF clock that owns the deadline).
+  button shows an animated ellipsis beside «جارٍ التفعيل» (the dots
+  cycle . → .. → ... on a pure-CSS 1.2 s timeline while the button
+  itself stays static; the state is toggled by the same rAF clock
+  that owns the deadline).
   The render loop memoises
-  its idle frames, so nothing competes with that pulse.
+  its idle frames, so nothing competes with that animation.
   A valid sample inside the window cancels the deadline and the
   compass goes live immediately; if the deadline expires first, the
   card flips to the red error message with an enabled retry button
   in the same frame. With no sensor API the wait is skipped and the
-  error is immediate (no pulse). Geolocation requests carry a matching 3 s
+  error is immediate (no loading state). Geolocation requests carry a matching 3 s
   timeout whose error path lands on decided copy, and while the
   error state is shown, location refreshes run silently so no
   «جارٍ تحديد موقعك…» text is ever layered under the red card.

@@ -74,8 +74,8 @@
   var ACTIVATION_DEADLINE_MS = 3000;
   /* The activation window is watched by a single rAF loop that owns
      ONLY the decision deadline — the button's loading feedback is a
-     pure-CSS pulse (.btn.loading in hero.css), so this clock draws
-     nothing. Each frame compares performance.now() against the
+     pure-CSS animated ellipsis (.btn.loading .dots in hero.css), so
+     this clock draws nothing. Each frame compares performance.now() against the
      armed start: a genuinely valid sample cancels the clock via
      clearUnsupported() and the compass goes live immediately, and
      if the deadline expires first, enterUnsupported() flips the
@@ -128,7 +128,7 @@
     statusTitle.textContent = 'جارٍ تحديد موقعك…';
     statusDesc.textContent = 'لحظات ونحسب زاوية القبلة من مكانك الحالي.';
     enableBtn.setAttribute('disabled', 'disabled');
-    btnText.textContent = 'جارٍ التفعيل…';
+    btnLabelText.textContent = 'جارٍ التفعيل';
   }
   function enterUnsupported(){
     if (state.sensorSeen) return;
@@ -143,7 +143,7 @@
     // Honest button state: not stuck on a disabled «البوصلة مفعّلة» —
     // it offers a retry (e.g. after connecting/enabling a sensor).
     enableBtn.removeAttribute('disabled');
-    btnText.textContent = 'إعادة محاولة التفعيل';
+    btnLabelText.textContent = 'إعادة محاولة التفعيل';
   }
   function clearUnsupported(){
     // A genuinely valid sample: cancel the deadline (if armed) and
@@ -156,7 +156,7 @@
     state.unsupported = false;
     state.activating = false;
     document.body.classList.remove('unsupported');
-    btnText.textContent = 'البوصلة مفعّلة';
+    btnLabelText.textContent = 'البوصلة مفعّلة';
     enableBtn.setAttribute('disabled', 'disabled');
     if (state.qibla !== null){
       statusTitle.textContent = QiblaDevice.fill('تم تحديد موقعك — حرّك {device}');
@@ -172,7 +172,7 @@
     }
     if (typeof DeviceOrientationEvent === 'undefined'){
       // Known-absent sensor API: skip the 3 s wait entirely — no
-      // loading pulse for a failure that is already known.
+      // loading state for a failure that is already known.
       enterUnsupported();
       return;
     }

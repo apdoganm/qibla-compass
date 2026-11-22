@@ -107,26 +107,41 @@
   .btn-ghost{ background:#fff; color:var(--ink); border:1px solid var(--line); }
   .btn-ghost:hover{ background:var(--soft); }
   .btn[disabled]{ opacity:.45; cursor:not-allowed; }
-  /* Activation loading pulse (وميض): while the 3 s decision window
-     in orientation.js runs, the button itself blinks — a sonar ring
-     expands from its edge and fades out while the black background
-     breathes gently between ink and #2e2e2e. Pure CSS: the JS only
-     toggles .loading (+ disabled / aria-busy) for the window's
-     duration. No fill element, no scale transform on the button
-     (the neighbouring ghost button must not jitter), and the label
-     stays static white — the button is dark throughout the pulse,
-     so contrast is full at every phase. */
+  /* Activation loading dots: while the 3 s decision window in
+     orientation.js runs, the button itself stays visually static;
+     only the ellipsis beside «جارٍ التفعيل» moves. The JS writes
+     the words into #btnLabelText only, so the sibling .dots span
+     inside #btnText is never wiped. Three phase keyframes share one
+     1.2 s timeline, so the dots build . → .. → ... and clear
+     together at the loop point (per-dot animation-delay alone
+     cannot do that: a delay applies once, not per iteration, and
+     the phases would drift into a rolling wave). */
   .btn-label{
     position:relative; z-index:1;
     display:inline-flex; align-items:center; gap:9px;
   }
-  .btn.loading{ opacity:1; animation:btn-pulse 1.15s ease-in-out infinite; }
-  @keyframes btn-pulse{
-    0%{ background:var(--ink); box-shadow:0 0 0 0 rgba(0,0,0,.28); }
-    50%{ background:#2e2e2e; }
-    100%{ background:var(--ink); box-shadow:0 0 0 16px rgba(0,0,0,0); }
+  #btnText{ display:inline-flex; align-items:center; }
+  .btn.loading{ opacity:1; }
+  .dots{ display:none; margin-inline-start:2px; }
+  .btn.loading .dots{ display:inline-flex; gap:1px; }
+  .dots i{
+    font-style:normal; opacity:0;
+    animation-duration:1.2s; animation-timing-function:linear;
+    animation-iteration-count:infinite;
+  }
+  .dots i:nth-child(1){ animation-name:dot-cycle-1; }
+  .dots i:nth-child(2){ animation-name:dot-cycle-2; }
+  .dots i:nth-child(3){ animation-name:dot-cycle-3; }
+  @keyframes dot-cycle-1{
+    0%{ opacity:0; } 8%,93%{ opacity:1; } 100%{ opacity:0; }
+  }
+  @keyframes dot-cycle-2{
+    0%,33%{ opacity:0; } 41%,93%{ opacity:1; } 100%{ opacity:0; }
+  }
+  @keyframes dot-cycle-3{
+    0%,66%{ opacity:0; } 74%,93%{ opacity:1; } 100%{ opacity:0; }
   }
   @media (prefers-reduced-motion: reduce){
-    .btn.loading{ animation:none; }
+    .btn.loading .dots i{ animation:none; opacity:1; }
   }
-  .hint{ font-size:12.5px; color:var(--sub); margin-top:12px; }
+  .hint{ font-size:12.5px; color:var(--sub); margin-top:32px; }

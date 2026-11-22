@@ -19,6 +19,7 @@
   var turnArrow = document.getElementById('turnArrow');
   var enableBtn = document.getElementById('enableBtn');
   var btnText = document.getElementById('btnText');
+  var btnLabelText = document.getElementById('btnLabelText');
   var locateBtn = document.getElementById('locateBtn');
   var placeText = document.getElementById('placeText');
   var toast = document.getElementById('toast');

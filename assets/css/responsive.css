@@ -32,7 +32,7 @@
      row at the bottom (hint bottom == note bottom). */
   @media (min-width:1080px){
     .hero > div:first-child{ display:flex; flex-direction:column; }
-    .hero > div:first-child .hint{ margin-top:auto; padding-top:12px; }
+    .hero > div:first-child .hint{ margin-top:auto; padding-top:32px; }
     .compass-zone{ padding:0; }
     #viewCompass{ flex:1; width:100%; display:grid; grid-template-rows:1fr auto; justify-items:center; }
     #viewCompass .compass-wrap{ align-self:center; }

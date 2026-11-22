@@ -29,7 +29,7 @@
           state.activating = false;
           endButtonLoading();
           enableBtn.removeAttribute('disabled');
-          btnText.textContent = 'تفعيل البوصلة والموقع';
+          btnLabelText.textContent = 'تفعيل البوصلة والموقع';
           showToast('يلزم إذن الحركة لعمل البوصلة');
           statusTitle.textContent = 'إذن الحركة متوقف';
           statusDesc.textContent = 'فعّل إذن الحركة من إعدادات المتصفح لهذا الموقع، ثم أعد تحميل الصفحة واضغط زر التفعيل من جديد.';
