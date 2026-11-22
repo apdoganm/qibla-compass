@@ -220,35 +220,3 @@
     requestAnimationFrame(tick);
   }
   requestAnimationFrame(tick);
-
-  /* ---------- TEMPORARY layout diagnostic (?debug=1 only) ----------
-     Flag-gated readout of the live viewport / dial geometry, added to
-     diagnose why the dial renders small on one real device. Inert
-     unless the URL carries debug=1: no element, no listeners. Remove
-     once the dial-size investigation closes. */
-  if (/[?&]debug=1(?:&|$)/.test(location.search)){
-    document.addEventListener('DOMContentLoaded', function(){
-      var box = document.createElement('div');
-      box.setAttribute('style', 'position:fixed;bottom:8px;inset-inline-start:8px;z-index:9999;background:#000;color:#0f0;font:11px/1.5 monospace;padding:6px 8px;border-radius:6px;direction:ltr;pointer-events:none;max-width:92vw;white-space:pre-wrap;');
-      document.body.appendChild(box);
-      function render(){
-        var wrap = document.querySelector('.compass-wrap');
-        var zone = document.querySelector('.compass-zone');
-        var vv = window.visualViewport;
-        var lines = [
-          'win: ' + window.innerWidth + 'x' + window.innerHeight + ' dpr:' + window.devicePixelRatio,
-          vv ? 'vv: ' + Math.round(vv.width) + 'x' + Math.round(vv.height) + ' scale:' + vv.scale : 'vv: n/a',
-          'dial: ' + (wrap ? wrap.offsetWidth : '?') + 'x' + (wrap ? wrap.offsetHeight : '?'),
-          'token: ' + getComputedStyle(document.documentElement).getPropertyValue('--dial-size').trim(),
-          'zone: ' + (zone ? zone.offsetWidth : '?'),
-          'ua: ' + navigator.userAgent
-        ];
-        box.textContent = lines.join('\n');
-      }
-      render();
-      window.addEventListener('resize', render);
-      window.addEventListener('orientationchange', render);
-      if (window.visualViewport) visualViewport.addEventListener('resize', render);
-      setTimeout(render, 1200);
-    });
-  }
