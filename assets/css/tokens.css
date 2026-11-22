@@ -20,8 +20,11 @@
     /* Dial diameter: ONE expression, width- AND height-aware, so the
        compass is always a perfect circle — when the viewport height
        is the constraint the circle shrinks, it never squashes.
+       Stacked screens: 94vw so the dial fills the screen width like
+       it does on desktop (the wrap's min(...,100%) caps it at the
+       compass zone's content width inside the .wrap padding).
        vh line first (universal fallback), svh line enhances it
        (svh = the small/stable viewport height on mobile browsers). */
-    --dial-size:min(88vw, 560px, 76vh);
-    --dial-size:min(88vw, 560px, 76svh);
+    --dial-size:min(94vw, 560px, 76vh);
+    --dial-size:min(94vw, 560px, 76svh);
   }

@@ -1,10 +1,24 @@
 /* ============================================================
    اتجاه القبلة — responsive rules (kept last: they override)
    ============================================================ */
-  /* ===== Small phones, large phones & tablets ===== */
+  /* ===== Stacked tablets & wide-viewport phones (600–1079px) =====
+     The two-column split only starts at 1080px, so this band is
+     still ONE stacked column and the dial keeps the stacked
+     fill-the-width behaviour: 94vw (the wrap's min(...,100%) caps
+     it at the compass zone's content width), a 700px ceiling, and
+     an 80svh height share so it never crowds the column. The old
+     64vw desktop share made the dial look small and lost here
+     (e.g. phones rendering a ~980px-wide desktop-mode viewport). */
   @media (min-width:600px){
     :root{
-      /* Desktop/tablet dial: a 700px cap and a 64vw share, but the
+      --dial-size:min(94vw, 700px, 80vh);
+      --dial-size:min(94vw, 700px, 80svh);
+    }
+  }
+  /* ===== Desktop dial (≥1080px, two-column hero only) ===== */
+  @media (min-width:1080px){
+    :root{
+      /* Desktop dial: a 700px cap and a 64vw share, but the
          height term now reserves the MEASURED fixed overhead of the
          first screen, so the dial is the largest circle that fits
          ENTIRELY inside it — the hero never grows past 100svh on
