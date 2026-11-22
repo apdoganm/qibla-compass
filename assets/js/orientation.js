@@ -81,14 +81,15 @@
      computed from the raw linear progress; only the VISUAL fill
      fraction is eased (easeVisual below), so the sweep glides
      while the decision still lands at exactly the deadline. The
-     fill is rendered as transform: scaleX() on an over-wide layer
+     fill is rendered as transform: scaleX() on a solid bar
      (origin at the right edge): composited by the GPU, so the
      sweep stays butter-smooth — animating width instead forced
      layout + paint every frame and visibly stuttered. */
   function easeVisual(p){
-    // Gentle ease for the fill only: quick off the mark, settling
-    // softly into 1 — 1-(1-p)^1.4 maps 0→0 and 1→1 monotonically.
-    return 1 - Math.pow(1 - p, 1.4);
+    // easeInOutCubic for the fill only: a slow, elegant start, a
+    // fluid middle and a gentle settle into 1 at the deadline.
+    // Maps 0→0, 0.5→0.5 and 1→1 monotonically.
+    return p < .5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
   }
   var activationClock = null; // { start, rafId, progress, fastFrom, fastStart }
   var reducedMotion = (typeof window.matchMedia === 'function') &&
@@ -178,7 +179,7 @@
     liveDot.classList.remove('on');
     liveText.textContent = 'تحديد الاتجاه غير مدعوم على هذا الجهاز';
     statusTitle.textContent = 'هذا الجهاز لا يدعم تحديد الاتجاه';
-    statusDesc.textContent = 'أجهزة الكمبيوتر لا تحتوي على مستشعر بوصلة مغناطيسي، فلا يمكن قياس اتجاهك هنا. زاوية القبلة من موقعك محدّدة في بطاقات البيانات بالأسفل — افتح نفس الرابط من هاتفك لمعرفة اتجاهك لحظة بلحظة.';
+    statusDesc.textContent = 'لا يحتوي هذا الجهاز على مستشعر بوصلة مغناطيسي، فافتح الرابط من هاتفك.';
     // Honest button state: not stuck on a disabled «البوصلة مفعّلة» —
     // it offers a retry (e.g. after connecting/enabling a sensor).
     enableBtn.removeAttribute('disabled');

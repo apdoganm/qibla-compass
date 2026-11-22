@@ -55,10 +55,11 @@ design, copy and styling are unchanged — the code is only split into files.
   Every activation — first tap and every retry — runs against a
   3-second deadline: while it runs, the status card shows the
   locating copy in the normal (non-red) styling and the activation
-  button shows a loading fill (grey base, black fill sweeping from
-  the right as a GPU-composited `scaleX()` transform, its leading
-  edge feathered by a 72px gradient to transparent and its motion
-  gently eased) driven by the same rAF clock as the deadline
+  button shows a loading fill (grey base, a solid black bar
+  sweeping from the right as a GPU-composited `scaleX()` transform,
+  its leading edge softened by a drop shadow — not a gradient —
+  and its motion eased in-out, while the button's compass icon
+  slowly rotates) driven by the same rAF clock as the deadline
   itself. The render loop memoises
   its idle frames, so nothing competes with that sweep.
   A valid sample inside the window fast-completes the fill (~250 ms)
