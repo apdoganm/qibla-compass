@@ -72,35 +72,19 @@
      is decided immediately. Idempotent: re-entering simply
      re-asserts the copy and button. */
   var ACTIVATION_DEADLINE_MS = 3000;
-  var FILL_FAST_MS = 250;
-  /* One clock, two consumers: a single rAF loop drives BOTH the
-     activation button's loading fill (0 → 1 across exactly
-     ACTIVATION_DEADLINE_MS) and the decision deadline itself,
-     timestamped from the same performance.now() readings — the
-     fill and the decision can never drift apart. The DEADLINE is
-     computed from the raw linear progress; only the VISUAL fill
-     fraction is eased (easeVisual below), so the sweep glides
-     while the decision still lands at exactly the deadline. The
-     fill is rendered as transform: scaleX() on a solid bar
-     (origin at the right edge): composited by the GPU, so the
-     sweep stays butter-smooth — animating width instead forced
-     layout + paint every frame and visibly stuttered. */
-  function easeVisual(p){
-    // easeInOutCubic for the fill only: a slow, elegant start, a
-    // fluid middle and a gentle settle into 1 at the deadline.
-    // Maps 0→0, 0.5→0.5 and 1→1 monotonically.
-    return p < .5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
-  }
-  var activationClock = null; // { start, rafId, progress, fastFrom, fastStart }
-  var reducedMotion = (typeof window.matchMedia === 'function') &&
-    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  function setBtnFill(p){
-    btnFill.style.transform = 'scaleX(' + p.toFixed(4) + ')';
-  }
+  /* The activation window is watched by a single rAF loop that owns
+     ONLY the decision deadline — the button's loading feedback is a
+     pure-CSS pulse (.btn.loading in hero.css), so this clock draws
+     nothing. Each frame compares performance.now() against the
+     armed start: a genuinely valid sample cancels the clock via
+     clearUnsupported() and the compass goes live immediately, and
+     if the deadline expires first, enterUnsupported() flips the
+     card to red + error message + enabled retry button as one
+     atomic decision. There is no path that loads forever. */
+  var activationClock = null; // { start, rafId }
   function endButtonLoading(){
     enableBtn.classList.remove('loading');
     enableBtn.removeAttribute('aria-busy');
-    setBtnFill(0);
   }
   function stopActivationClock(){
     if (activationClock){
@@ -109,49 +93,25 @@
       endButtonLoading();
     }
     // No clock running → the button was never in the loading state;
-    // touch nothing (a known-absent sensor must see zero fill writes).
+    // touch nothing (a known-absent sensor shows the error instantly,
+    // with no loading state at all).
   }
   function startActivationClock(){
     stopActivationClock();
-    var clock = { start: performance.now(), rafId: 0, progress: 0, fastFrom: -1, fastStart: 0 };
+    var clock = { start: performance.now(), rafId: 0 };
     activationClock = clock;
     enableBtn.classList.add('loading');
     enableBtn.setAttribute('aria-busy', 'true');
-    setBtnFill(0);
     var step = function(){
       if (activationClock !== clock) return; // cancelled or superseded
-      var now = performance.now();
-      var p;
-      if (clock.fastFrom >= 0){
-        // Early success: sweep the remaining fill home in ~250 ms,
-        // then show the live state — nobody waits the full 3 s for a
-        // compass that already works. The fast sweep eases into 1
-        // with the same curve as the main fill.
-        var fp = Math.min(1, (now - clock.fastStart) / FILL_FAST_MS);
-        p = clock.fastFrom + (1 - clock.fastFrom) * easeVisual(fp);
-        clock.progress = p;
-        setBtnFill(p);
-        if (fp >= 1){
-          activationClock = null;
-          endButtonLoading();
-          applyCompassLive();
-          return;
-        }
-      } else {
-        var raw = Math.min(1, (now - clock.start) / ACTIVATION_DEADLINE_MS);
-        p = easeVisual(raw); // visual fraction only — deadline below uses raw
-        if (reducedMotion) p = Math.ceil(p * 10) / 10; // coarse steps only
-        clock.progress = p;
-        setBtnFill(p);
-        if (raw >= 1){
-          // Deadline: the decision lands in the same frame the fill
-          // completes — red error + enabled retry, atomically.
-          activationClock = null;
-          endButtonLoading();
-          state.activating = false;
-          if (!state.sensorSeen) enterUnsupported();
-          return;
-        }
+      if (performance.now() - clock.start >= ACTIVATION_DEADLINE_MS){
+        // Deadline reached with no valid sample: red error +
+        // enabled retry, atomically, in this frame.
+        activationClock = null;
+        endButtonLoading();
+        state.activating = false;
+        if (!state.sensorSeen) enterUnsupported();
+        return;
       }
       clock.rafId = requestAnimationFrame(step);
     };
@@ -186,15 +146,10 @@
     btnText.textContent = 'إعادة محاولة التفعيل';
   }
   function clearUnsupported(){
-    if (activationClock){
-      if (activationClock.fastFrom < 0){
-        // A valid sample inside the deadline window: fast-complete
-        // the fill (~250 ms); applyCompassLive() runs when it lands.
-        activationClock.fastFrom = activationClock.progress;
-        activationClock.fastStart = performance.now();
-      }
-      return; // fast-complete already in flight on a second sample
-    }
+    // A genuinely valid sample: cancel the deadline (if armed) and
+    // go live immediately — the compass that already works never
+    // waits out the window.
+    stopActivationClock();
     applyCompassLive();
   }
   function applyCompassLive(){
@@ -216,8 +171,8 @@
       window.addEventListener('deviceorientation', function(e){ onOrientation(e, e.absolute === true); }, true);
     }
     if (typeof DeviceOrientationEvent === 'undefined'){
-      // Known-absent sensor API: skip the 3 s wait entirely — and no
-      // fake fill for a failure that is already known.
+      // Known-absent sensor API: skip the 3 s wait entirely — no
+      // loading pulse for a failure that is already known.
       enterUnsupported();
       return;
     }
