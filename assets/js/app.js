@@ -7,6 +7,12 @@
 
   enableBtn.addEventListener('click', function(){
     state.enabled = true;
+    // Mark the button activated BEFORE starting the sensor/location
+    // flow: on an unsupported device enterUnsupported() runs inside
+    // startOrientation() and must be able to override this state with
+    // its retry wording instead of being overwritten by it.
+    enableBtn.textContent = 'البوصلة مفعّلة';
+    enableBtn.setAttribute('disabled', 'disabled');
     requestLocation();
     if (typeof DeviceOrientationEvent !== 'undefined' &&
         typeof DeviceOrientationEvent.requestPermission === 'function'){
@@ -23,8 +29,6 @@
     } else {
       startOrientation();
     }
-    enableBtn.textContent = 'البوصلة مفعّلة';
-    enableBtn.setAttribute('disabled', 'disabled');
   });
   locateBtn.addEventListener('click', requestLocation);
 
@@ -91,7 +95,7 @@
     dial.style.transform = 'rotate(' + (-h) + 'deg)';
     if (!hasHeading){
       hubHeading.textContent = '—°';
-      hubDiff.textContent = 'بانتظار التفعيل';
+      hubDiff.textContent = state.unsupported ? 'الاتجاه غير مدعوم هنا' : 'بانتظار التفعيل';
       hubDiff.className = 'diff';
       dAlign.textContent = '—';
       dAlignSub.textContent = 'الاصطفاف الدقيق ضمن ±٥°';

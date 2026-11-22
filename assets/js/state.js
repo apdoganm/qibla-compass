@@ -48,6 +48,7 @@
     displayHeading: 0,      // smoothed
     hasSensor: false,
     sensorSeen: false,
+    unsupported: false,      // no usable direction sensor on this device (e.g. desktop)
     aligned: false,
     enabled: false,
     lastVibrate: 0,

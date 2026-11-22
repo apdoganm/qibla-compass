@@ -7,6 +7,12 @@
     flex-wrap:wrap;
     padding:16px 0 4px;
   }
+  .brand{
+    display:flex; align-items:center; gap:10px;
+    font-size:17px; font-weight:700; color:var(--ink);
+    letter-spacing:-0.01em;
+  }
+  .brand img{ flex:none; display:block; }
   .topbar .place{
     display:flex; align-items:center; gap:8px;
     font-size:13px; font-weight:500; color:var(--ink-2);

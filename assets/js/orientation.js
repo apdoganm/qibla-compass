@@ -1,7 +1,8 @@
 /* ============================================================
    اتجاه القبلة — orientation.js
    Device-orientation handling: tilt-compensated heading,
-   absolute-stream preference, calibration accuracy state.
+   absolute-stream preference, calibration accuracy state,
+   and the no-direction-sensor (unsupported device) state.
    ============================================================ */
 "use strict";
 
@@ -36,6 +37,7 @@
     }
     if (isAbs || compassGrade) state.absGradeSeen = true;
     if (!state.firstEventAt) state.firstEventAt = now;
+    if (state.unsupported) clearUnsupported();
     state.sensorSeen = true;
     state.hasSensor = true;
     state.targetHeading = norm360(h);
@@ -43,16 +45,54 @@
     liveDot.classList.add('on');
     liveText.textContent = 'البوصلة تعمل الآن';
   }
+  /* ---------- Unsupported state: no direction sensor ----------
+     Desktops and sensor-less devices can locate the user (so the qibla
+     angle, distance and coordinates below are all correct), but they
+     have no magnetic compass, so no heading can ever arrive. Say that
+     plainly instead of pretending the compass is live and waiting for
+     movement. Entered when DeviceOrientationEvent does not exist at
+     all, or when the watchdog sees no valid heading sample within
+     4 s of activation (the classic desktop-Chrome case: the listener
+     registers but alpha stays null forever). A valid sample arriving
+     later clears the state automatically via clearUnsupported().
+     The iOS permission-denied message is a separate state and is
+     never merged into this one. */
+  function enterUnsupported(){
+    if (state.sensorSeen || state.unsupported) return;
+    state.unsupported = true;
+    liveDot.classList.remove('on');
+    liveText.textContent = 'تحديد الاتجاه غير مدعوم على هذا الجهاز';
+    statusTitle.textContent = 'هذا الجهاز لا يدعم تحديد الاتجاه';
+    statusDesc.textContent = 'أجهزة الكمبيوتر لا تحتوي على مستشعر بوصلة مغناطيسي، فلا يمكن قياس اتجاهك هنا. زاوية القبلة من موقعك محدّدة في بطاقات البيانات بالأسفل — افتح نفس الرابط من هاتفك لمعرفة اتجاهك لحظة بلحظة.';
+    // Honest button state: not stuck on a disabled «البوصلة مفعّلة» —
+    // it offers a retry (e.g. after connecting/enabling a sensor).
+    enableBtn.removeAttribute('disabled');
+    enableBtn.textContent = 'إعادة محاولة التفعيل';
+  }
+  function clearUnsupported(){
+    state.unsupported = false;
+    enableBtn.textContent = 'البوصلة مفعّلة';
+    enableBtn.setAttribute('disabled', 'disabled');
+    if (state.qibla !== null){
+      statusTitle.textContent = 'تم تحديد موقعك — حرّك هاتفك';
+      statusDesc.textContent = 'الآن لفّ جسمك ببطء حتى يصطف الخط مع الكعبة.';
+    }
+  }
+  var orientationStarted = false;
+  var headingWatchdog = null;
   function startOrientation(){
-    window.addEventListener('deviceorientationabsolute', function(e){ onOrientation(e, true); }, true);
-    window.addEventListener('deviceorientation', function(e){ onOrientation(e, e.absolute === true); }, true);
-    // If nothing arrives (desktop / sensor-less device), say so plainly:
-    // the compass simply keeps waiting for a real heading.
-    setTimeout(function(){
-      if (!state.sensorSeen){
-        liveText.textContent = 'لا يوجد مستشعر بوصلة في هذا الجهاز';
-        statusTitle.textContent = 'لا يوجد مستشعر بوصلة هنا';
-        statusDesc.textContent = 'هذا الجهاز لا يرسل بيانات اتجاه — البوصلة تحتاج هاتفاً بمستشعر مغناطيسي. افتح الصفحة من هاتفك للتجربة الكاملة.';
-      }
-    }, 2500);
+    if (!orientationStarted){
+      orientationStarted = true;
+      window.addEventListener('deviceorientationabsolute', function(e){ onOrientation(e, true); }, true);
+      window.addEventListener('deviceorientation', function(e){ onOrientation(e, e.absolute === true); }, true);
+    }
+    if (typeof DeviceOrientationEvent === 'undefined'){
+      enterUnsupported();
+      return;
+    }
+    if (headingWatchdog) clearTimeout(headingWatchdog);
+    headingWatchdog = setTimeout(function(){
+      headingWatchdog = null;
+      if (!state.sensorSeen) enterUnsupported();
+    }, 4000);
   }

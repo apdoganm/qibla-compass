@@ -138,10 +138,25 @@
       placeState.lat = lat; placeState.lon = lon; placeState.label = label;
       setPlaceLabel(label);
       persistPlace(lat, lon, label);
+      // The user may have moved on while this lookup was in flight —
+      // resolve the place for where they actually are now.
+      if (state.lat !== null && state.lon !== null &&
+          haversineKm(state.lat, state.lon, lat, lon) >= 1){
+        resolvePlace(state.lat, state.lon);
+      }
     };
+    // Backstop: fetchPlaceName aborts at 6 s, but a request intercepted
+    // or stalled by the network / an extension could otherwise never
+    // settle, leaving `pending` stuck and the strip on its default text
+    // forever after a real fix. Force the coordinates fallback instead.
+    var settleTimer = setTimeout(function(){
+      if (placeState.pending) done(coordsLabel(lat, lon));
+    }, 7000);
     fetchPlaceName(lat, lon).then(function(name){
+      clearTimeout(settleTimer);
       done(name || coordsLabel(lat, lon));
     }).catch(function(){
+      clearTimeout(settleTimer);
       done(coordsLabel(lat, lon));
     });
   }
@@ -150,13 +165,15 @@
     var acc = pos.coords.accuracy || 50;
     if (state.lat !== null && Math.abs(state.lat - lat) < 0.00001 && Math.abs(state.lon - lon) < 0.00001){
       // Same spot (e.g. the watch confirming the saved fix): just refresh
-      // the accuracy label so it no longer reads as a stale saved value.
+      // the accuracy label so it no longer reads as a stale saved value —
+      // but still make sure the place label gets resolved for this fix.
       dAcc.textContent = 'دقة الموقع: ±' + Math.round(acc) + ' متر';
+      resolvePlace(lat, lon);
       return;
     }
     applyPosition(lat, lon, acc);
     savePosition(lat, lon, acc);
-    if (!state.aligned){
+    if (!state.aligned && !state.unsupported){
       statusTitle.textContent = 'تم تحديد موقعك — حرّك هاتفك';
       statusDesc.textContent = 'الآن لفّ جسمك ببطء حتى يصطف الخط مع الكعبة. وسيُحدّث موقعك تلقائياً إذا تحركت.';
     }

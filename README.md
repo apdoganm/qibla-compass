@@ -30,8 +30,17 @@ design, copy and styling are unchanged — the code is only split into files.
   keyless endpoint. Lookups are throttled to one per ≥1 km of movement,
   the resolved name is cached with the saved position, and any lookup
   failure falls back to showing the formatted coordinates instead.
-- On devices without a compass sensor the page simply says so and keeps
-  waiting for a real heading after activation.
+- Devices without a direction sensor (desktops, sensor-less hardware)
+  get an explicit unsupported state: if `DeviceOrientationEvent` does
+  not exist, or no valid heading sample arrives within 4 s of
+  activation (desktop browsers fire the event with `alpha` permanently
+  null), the status card, top pill, dial hub and strip all state that
+  the device does not support direction detection — no alignment, no
+  vibration, and the activation button offers a retry instead of
+  claiming the compass is on. The location-based data (Qibla angle,
+  distance, coordinates, declination) still populates normally, and a
+  real heading sample arriving later clears the state automatically.
+  (iOS motion-permission denial keeps its own separate message.)
 - Arabic-first, full RTL, IBM Plex Sans Arabic.
 
 ## Project structure
@@ -39,6 +48,8 @@ design, copy and styling are unchanged — the code is only split into files.
 ```
 index.html                  Semantic markup only; links the CSS/JS below.
 assets/
+  logo.svg                  Site logo (isometric Kaaba) — header, footer
+                            and favicon.
   css/
     main.css                Entry point — @imports the partials in the
                             original cascade order (responsive last).

@@ -29,8 +29,13 @@
     if (!hasHeading){
       strip.className = 'strip idle';
       stripDeg.textContent = '—°';
-      stripGuide.textContent = 'فعّل البوصلة لبدء التوجيه';
-      stripSub.textContent = 'الأسهم الزرقاء تشير لاتجاه التصحيح، وتقلّ كلما اقتربت من القبلة';
+      if (state.unsupported){
+        stripGuide.textContent = 'هذا الجهاز لا يدعم تحديد الاتجاه';
+        stripSub.textContent = 'افتح نفس الرابط من هاتفك لمعرفة اتجاهك لحظياً';
+      } else {
+        stripGuide.textContent = 'فعّل البوصلة لبدء التوجيه';
+        stripSub.textContent = 'الأسهم الزرقاء تشير لاتجاه التصحيح، وتقلّ كلما اقتربت من القبلة';
+      }
       stripArrows.className = 'strip-arrows';
       for (i = 0; i < arrows.length; i++) arrows[i].style.opacity = '0';
       return;
