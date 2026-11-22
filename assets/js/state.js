@@ -1,5 +1,5 @@
 /* ============================================================
-   بوصلة القبلة — state.js
+   اتجاه القبلة — state.js
    DOM element references and the shared application state.
    Loaded before every other app script.
    ============================================================ */
@@ -19,8 +19,7 @@
   var turnArrow = document.getElementById('turnArrow');
   var enableBtn = document.getElementById('enableBtn');
   var locateBtn = document.getElementById('locateBtn');
-  var manualBox = document.getElementById('manualBox');
-  var manualRange = document.getElementById('manualRange');
+  var placeText = document.getElementById('placeText');
   var toast = document.getElementById('toast');
   var dQibla = document.getElementById('dQibla');
   var dDist = document.getElementById('dDist');
@@ -42,14 +41,13 @@
   var calibWarn = document.getElementById('calibWarn');
 
   var state = {
-    lat: null, lon: null, accuracy: null,
+    lat: null, lon: null,
     qibla: null, distance: null,
     declination: 0,         // WMM2025 magnetic declination D at the user's position (east +)
-    targetHeading: null,   // raw sensor/manual heading
+    targetHeading: null,   // raw sensor heading
     displayHeading: 0,      // smoothed
     hasSensor: false,
     sensorSeen: false,
-    manual: false,
     aligned: false,
     enabled: false,
     lastVibrate: 0,
@@ -57,6 +55,5 @@
     compassUnreliable: false,
     absGradeSeen: false,     // an absolute / compass-grade reading has arrived
     firstEventAt: 0,
-    watchStarted: false,
-    posSaved: false
+    watchStarted: false
   };

@@ -1,5 +1,5 @@
 /* ============================================================
-   بوصلة القبلة — geo.js
+   اتجاه القبلة — geo.js
    Constants and spherical math: Qibla bearing, distance to
    the Kaaba, angle helpers and number formatting.
    ============================================================ */

@@ -1,4 +1,4 @@
-# بوصلة القبلة — Qibla Compass
+# اتجاه القبلة — Qibla Direction
 
 A single-page web app that shows the exact Qibla direction from anywhere in
 the world: a live compass (plus an alternative direction-strip view) driven by
@@ -25,7 +25,13 @@ design, copy and styling are unchanged — the code is only split into files.
 - Location is requested once: the last fix is kept in `localStorage`
   (`qibla:lastPosition`), shown instantly on later visits, and a single
   `watchPosition` keeps angle/distance/declination updated silently.
-- Manual preview slider for devices without a compass sensor.
+- The top strip names the visitor's current place (city + country, in
+  Arabic) once a fix exists, reverse-geocoded via BigDataCloud's free
+  keyless endpoint. Lookups are throttled to one per ≥1 km of movement,
+  the resolved name is cached with the saved position, and any lookup
+  failure falls back to showing the formatted coordinates instead.
+- On devices without a compass sensor the page simply says so and keeps
+  waiting for a real heading after activation.
 - Arabic-first, full RTL, IBM Plex Sans Arabic.
 
 ## Project structure
@@ -41,7 +47,7 @@ assets/
     layout.css              Page wrap, top strip, live indicator.
     hero.css                Hero, status pill, buttons.
     compass.css             Compass dial, Kaaba marker, hub, mode switch.
-    strip.css               Direction strip + manual preview.
+    strip.css               Direction strip.
     cards.css               Data cards grid.
     sections.css            Steps, note, footer, toast.
     responsive.css          Breakpoints, landscape, reduced motion.
@@ -55,10 +61,11 @@ assets/
     filter.js               One Euro heading filter.
     dial.js                 Builds the dial ticks/numbers/cardinals.
     ui.js                   Toast, mode switch, strip rendering.
-    location.js             Geolocation: saved fix, watch, declination.
+    location.js             Geolocation: saved fix, watch, declination,
+                            reverse geocoding of the current place.
     orientation.js          Device-orientation handling.
-    app.js                  Boot: activation controls, init preview,
-                            render loop. Loaded last.
+    app.js                  Boot: activation controls, saved-position
+                            restore, render loop. Loaded last.
 ```
 
 Scripts are plain ordered `<script>` tags (no build step, no modules) and
@@ -76,7 +83,13 @@ python3 -m http.server 8000
 Notes:
 
 - Geolocation and device-orientation permissions require HTTPS (or
-  `localhost`) in most browsers; opening via `file://` works for layout and
-  the manual preview, but sensor/location behaviour depends on the browser's
-  saved permission for the origin.
-- The only external dependency is Google Fonts (IBM Plex Sans Arabic).
+  `localhost`) in most browsers; opening via `file://` works for layout,
+  but sensor/location behaviour depends on the browser's saved permission
+  for the origin.
+- Privacy: the position itself is stored only on the device
+  (`localStorage`). The one exception is the place-name lookup: on a new
+  fix (and after moving ≥1 km) the coordinates are sent to BigDataCloud's
+  reverse-geocoding endpoint solely to resolve the city/country name
+  shown in the top strip — nothing else leaves the device.
+- External services: Google Fonts (IBM Plex Sans Arabic) and the
+  BigDataCloud reverse-geocode-client API (no key, no account).

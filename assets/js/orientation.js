@@ -1,5 +1,5 @@
 /* ============================================================
-   بوصلة القبلة — orientation.js
+   اتجاه القبلة — orientation.js
    Device-orientation handling: tilt-compensated heading,
    absolute-stream preference, calibration accuracy state.
    ============================================================ */
@@ -38,8 +38,6 @@
     if (!state.firstEventAt) state.firstEventAt = now;
     state.sensorSeen = true;
     state.hasSensor = true;
-    state.manual = false;
-    manualBox.classList.remove('show');
     state.targetHeading = norm360(h);
     feedHeading(h, now);
     liveDot.classList.add('on');
@@ -48,16 +46,13 @@
   function startOrientation(){
     window.addEventListener('deviceorientationabsolute', function(e){ onOrientation(e, true); }, true);
     window.addEventListener('deviceorientation', function(e){ onOrientation(e, e.absolute === true); }, true);
-    // If nothing arrives (desktop), offer manual preview
+    // If nothing arrives (desktop / sensor-less device), say so plainly:
+    // the compass simply keeps waiting for a real heading.
     setTimeout(function(){
       if (!state.sensorSeen){
-        manualBox.classList.add('show');
-        if (state.targetHeading === null){
-          setManualHeading(parseFloat(manualRange.value));
-        }
-        liveText.textContent = 'وضع المعاينة اليدوية';
+        liveText.textContent = 'لا يوجد مستشعر بوصلة في هذا الجهاز';
         statusTitle.textContent = 'لا يوجد مستشعر بوصلة هنا';
-        statusDesc.textContent = 'هذا الجهاز لا يرسل بيانات اتجاه — استخدم مؤشر المعاينة أسفل البوصلة، أو افتح الصفحة من هاتفك للتجربة الكاملة.';
+        statusDesc.textContent = 'هذا الجهاز لا يرسل بيانات اتجاه — البوصلة تحتاج هاتفاً بمستشعر مغناطيسي. افتح الصفحة من هاتفك للتجربة الكاملة.';
       }
     }, 2500);
   }

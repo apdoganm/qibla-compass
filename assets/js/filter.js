@@ -1,6 +1,6 @@
 /* ============================================================
-   بوصلة القبلة — filter.js
-   One Euro adaptive heading filter + manual heading setter.
+   اتجاه القبلة — filter.js
+   One Euro adaptive heading filter.
    ============================================================ */
 "use strict";
 
@@ -35,10 +35,4 @@
     var a = oeAlpha(cutoff, dt);
     filt.x = norm360(filt.x + a * shortestDelta(filt.x, raw));
     state.displayHeading = filt.x;
-  }
-  function setManualHeading(v){
-    state.manual = true;
-    state.targetHeading = v;
-    filt.x = v; filt.dx = 0; filt.lastRaw = v;
-    state.displayHeading = v;
   }

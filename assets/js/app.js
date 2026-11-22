@@ -1,6 +1,6 @@
 /* ============================================================
-   بوصلة القبلة — app.js
-   Boot: activation controls, saved-position preview and
+   اتجاه القبلة — app.js
+   Boot: activation controls, saved-position restore and
    the render loop. Loaded last.
    ============================================================ */
 "use strict";
@@ -14,11 +14,11 @@
         if (res === 'granted'){ startOrientation(); }
         else {
           showToast('يلزم إذن الحركة لعمل البوصلة');
-          manualBox.classList.add('show');
-          setManualHeading(parseFloat(manualRange.value));
+          statusTitle.textContent = 'إذن الحركة متوقف';
+          statusDesc.textContent = 'فعّل إذن الحركة من إعدادات المتصفح لهذا الموقع، ثم أعد تحميل الصفحة واضغط زر التفعيل من جديد.';
         }
       }).catch(function(){
-        manualBox.classList.add('show');
+        showToast('تعذّر طلب إذن الحركة — أعد المحاولة');
       });
     } else {
       startOrientation();
@@ -28,22 +28,17 @@
   });
   locateBtn.addEventListener('click', requestLocation);
 
-  manualRange.addEventListener('input', function(){
-    setManualHeading(parseFloat(manualRange.value));
-  });
-
   // Before activation: show the last saved fix instantly when one exists on
-  // this device (labelled as saved), otherwise an honest Cairo preview.
-  // No heading is shown until a real sensor (or the manual preview slider) provides one.
-  (function initPreview(){
+  // this device (labelled as saved), otherwise an honest Cairo fallback.
+  // No heading is shown until a real sensor provides one.
+  (function initPosition(){
     var saved = loadSavedPosition();
     if (saved){
       applyPosition(saved.lat, saved.lon, saved.acc || 50);
       dAcc.textContent = 'آخر موقع محفوظ على هذا الجهاز — سيُحدّث تلقائياً عند توفر موقع جديد';
-      state.posSaved = true;
     } else {
-      applyPosition(30.0444, 31.2357, 0);
-      dAcc.textContent = 'موقع معاينة (القاهرة) — فعّل موقعك للدقة';
+      applyPosition(30.0444, 31.2357, 0, true);
+      dAcc.textContent = 'موقع افتراضي (القاهرة) — فعّل موقعك للدقة';
     }
     state.targetHeading = null;
     state.displayHeading = 0;
@@ -52,13 +47,15 @@
     // (On a local file:// page the browser may not keep this permission;
     // then the saved position above is what gets shown until activation.)
     if ('permissions' in navigator && navigator.permissions && navigator.permissions.query){
-      navigator.permissions.query({ name: 'geolocation' }).then(function(st){
-        if (st.state === 'granted') startWatch();
-        st.onchange = function(){
+      try {
+        navigator.permissions.query({ name: 'geolocation' }).then(function(st){
           if (st.state === 'granted') startWatch();
-          else if (st.state === 'denied') onPositionError({ code: 1 });
-        };
-      }).catch(function(){});
+          st.onchange = function(){
+            if (st.state === 'granted') startWatch();
+            else if (st.state === 'denied') onPositionError({ code: 1 });
+          };
+        }).catch(function(){});
+      } catch(e){ /* a few browsers throw synchronously for this query — the watch then simply starts on activation */ }
     }
   })();
 
@@ -71,15 +68,15 @@
   }
   function tick(){
     // A heading counts as real only when it comes from the device sensor
-    // or from the manual preview slider — never before activation.
-    var hasHeading = state.targetHeading !== null && (state.sensorSeen || state.manual);
+    // — never before activation.
+    var hasHeading = state.targetHeading !== null && state.sensorSeen;
     // Compass trust: iOS reports its own accuracy in degrees (negative =
     // invalid); elsewhere, a stream that only ever delivers relative
     // readings is not compass-grade either. While untrusted we still show
     // the heading, but we refuse to declare alignment or vibrate.
     var accBad = typeof state.compassAccuracy === 'number' &&
                  (state.compassAccuracy < 0 || state.compassAccuracy > 25);
-    var relOnly = state.sensorSeen && !state.manual && !state.absGradeSeen &&
+    var relOnly = state.sensorSeen && !state.absGradeSeen &&
                   state.firstEventAt > 0 && (performance.now() - state.firstEventAt > 3000);
     state.compassUnreliable = !!(accBad || relOnly);
     calibWarn.classList.toggle('show', hasHeading && state.compassUnreliable);
@@ -143,7 +140,7 @@
         hubDiff.className = 'diff';
         dAlign.textContent = fmt(diff, 0) + '°';
         dAlignSub.textContent = signed > 0 ? 'أدر هاتفك يميناً لتقليل الفرق' : 'أدر هاتفك يساراً لتقليل الفرق';
-        if (state.enabled || state.manual){
+        if (state.enabled){
           turnText.textContent = signed > 0
             ? 'أدر هاتفك يميناً بمقدار ' + fmt(Math.abs(signed), 0) + '°'
             : 'أدر هاتفك يساراً بمقدار ' + fmt(Math.abs(signed), 0) + '°';

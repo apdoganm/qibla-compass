@@ -1,7 +1,8 @@
 /* ============================================================
-   بوصلة القبلة — location.js
+   اتجاه القبلة — location.js
    Geolocation: one explicit fix, saved position, silent
-   watchPosition updates, WMM2025 declination per fix.
+   watchPosition updates, WMM2025 declination per fix, and
+   reverse geocoding of the current place for the top strip.
    ============================================================ */
 "use strict";
 
@@ -12,9 +13,21 @@
      qibla angle, distance and coordinates updated silently — the browser
      does not re-ask while permission stands for this site. */
   var LS_KEY = 'qibla:lastPosition';
-  function savePosition(lat, lon, acc){
+  function savePosition(lat, lon, acc, place, placeLat, placeLon){
     try {
-      localStorage.setItem(LS_KEY, JSON.stringify({ lat: lat, lon: lon, acc: acc, ts: Date.now() }));
+      var rec = { lat: lat, lon: lon, acc: acc, ts: Date.now() };
+      if (typeof place === 'string' && place){
+        rec.place = place; rec.placeLat = placeLat; rec.placeLon = placeLon;
+      } else {
+        // Keep any previously resolved place that still belongs to this area
+        var prev = loadSavedPosition();
+        if (prev && typeof prev.place === 'string' && prev.place &&
+            typeof prev.placeLat === 'number' && typeof prev.placeLon === 'number' &&
+            haversineKm(lat, lon, prev.placeLat, prev.placeLon) < 1){
+          rec.place = prev.place; rec.placeLat = prev.placeLat; rec.placeLon = prev.placeLon;
+        }
+      }
+      localStorage.setItem(LS_KEY, JSON.stringify(rec));
     } catch(e){ /* storage unavailable (private mode / sandbox) — session still works */ }
   }
   function loadSavedPosition(){
@@ -35,8 +48,8 @@
     state.declination = (typeof d === 'number' && isFinite(d)) ? d : 0;
     dDecl.textContent = (state.declination >= 0 ? '+' : '') + fmt(state.declination, 1) + '°';
   }
-  function applyPosition(lat, lon, acc){
-    state.lat = lat; state.lon = lon; state.accuracy = acc;
+  function applyPosition(lat, lon, acc, skipPlace){
+    state.lat = lat; state.lon = lon;
     state.qibla = calcQibla(lat, lon);
     state.distance = calcDistance(lat, lon);
     updateDeclination(lat, lon);
@@ -47,6 +60,90 @@
     dDist.innerHTML = fmt(Math.round(state.distance), 0) + ' <small>كم</small>';
     dCoords.textContent = fmt(lat, 4) + ', ' + fmt(lon, 4);
     dAcc.textContent = 'دقة الموقع: ±' + Math.round(acc) + ' متر';
+    // The top strip names where the visitor actually is — except for the
+    // built-in Cairo fallback shown before any real fix exists.
+    if (!skipPlace) resolvePlace(lat, lon);
+  }
+
+  /* ---------- Reverse geocoding: name of the visitor's place ----------
+     The top strip keeps its default destination text until a real (or
+     saved) fix exists; then it shows the visitor's own city + country in
+     Arabic, e.g. «القاهرة، مصر». Lookup: BigDataCloud's free, keyless,
+     CORS-enabled reverse-geocode-client endpoint. The coordinates go
+     only to that endpoint, only for this lookup. Throttled hard: a new
+     lookup happens only after moving >= 1 km from the last geocoded
+     point, and the resolved name is cached with the saved position, so
+     revisits render it instantly with no network call. Any failure or
+     timeout falls back to plain formatted coordinates in the strip. */
+  function haversineKm(lat1, lon1, lat2, lon2){
+    var dLat = toRad(lat2 - lat1), dLon = toRad(lon2 - lon1);
+    var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    return 6371 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  }
+  var placeState = { lat: null, lon: null, label: null, pending: false };
+  function setPlaceLabel(text){
+    if (placeText) placeText.textContent = text;
+  }
+  function coordsLabel(lat, lon){
+    return fmt(lat, 4) + ', ' + fmt(lon, 4);
+  }
+  function fetchPlaceName(lat, lon){
+    if (typeof fetch === 'undefined') return Promise.reject(new Error('no fetch'));
+    var url = 'https://api.bigdatacloud.net/data/reverse-geocode-client' +
+              '?latitude=' + lat + '&longitude=' + lon + '&localityLanguage=ar';
+    var ctrl = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+    var timer = ctrl ? setTimeout(function(){ ctrl.abort(); }, 6000) : null;
+    return fetch(url, ctrl ? { signal: ctrl.signal } : undefined).then(function(r){
+      if (timer) clearTimeout(timer);
+      if (!r.ok) throw new Error('geocode http ' + r.status);
+      return r.json();
+    }).then(function(d){
+      var city = d.city || d.locality || d.principalSubdivision || '';
+      var country = d.countryName || '';
+      var label = [city, country].filter(function(s){ return !!s; }).join('، ');
+      return label || null;
+    });
+  }
+  function persistPlace(lat, lon, label){
+    try {
+      var p = loadSavedPosition();
+      if (!p || typeof p.lat !== 'number' || typeof p.lon !== 'number') return;
+      p.place = label; p.placeLat = lat; p.placeLon = lon;
+      localStorage.setItem(LS_KEY, JSON.stringify(p));
+    } catch(e){ /* cache is best-effort only */ }
+  }
+  function resolvePlace(lat, lon){
+    // Already resolved for this area (this session): keep the label.
+    if (placeState.lat !== null &&
+        haversineKm(lat, lon, placeState.lat, placeState.lon) < 1){
+      if (placeState.label) setPlaceLabel(placeState.label);
+      return;
+    }
+    // Cached with the saved position from an earlier visit: instant, offline.
+    var saved = loadSavedPosition();
+    if (saved && typeof saved.place === 'string' && saved.place &&
+        typeof saved.placeLat === 'number' && typeof saved.placeLon === 'number' &&
+        haversineKm(lat, lon, saved.placeLat, saved.placeLon) < 1){
+      placeState.lat = saved.placeLat; placeState.lon = saved.placeLon;
+      placeState.label = saved.place;
+      setPlaceLabel(saved.place);
+      return;
+    }
+    if (placeState.pending) return;
+    placeState.pending = true;
+    var done = function(label){
+      placeState.pending = false;
+      placeState.lat = lat; placeState.lon = lon; placeState.label = label;
+      setPlaceLabel(label);
+      persistPlace(lat, lon, label);
+    };
+    fetchPlaceName(lat, lon).then(function(name){
+      done(name || coordsLabel(lat, lon));
+    }).catch(function(){
+      done(coordsLabel(lat, lon));
+    });
   }
   function onPosition(pos){
     var lat = pos.coords.latitude, lon = pos.coords.longitude;

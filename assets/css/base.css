@@ -1,8 +1,8 @@
 /* ============================================================
-   بوصلة القبلة — base / reset
+   اتجاه القبلة — base / reset
    ============================================================ */
   *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-  html{ scroll-behavior:smooth; }
+  html{ scroll-behavior:smooth; overflow-x:hidden; }
   body{
     margin:0;
     background:var(--bg);
@@ -11,5 +11,10 @@
     line-height:1.7;
     overflow-x:hidden;
   }
-  button{ font-family:inherit; cursor:pointer; min-height:48px; }
-  .wrap{ max-width:1120px; margin:0 auto; padding:0 clamp(14px, 4.5vw, 20px); }
+  button{ font-family:inherit; cursor:pointer; min-height:48px; touch-action:manipulation; }
+  .wrap{
+    max-width:1120px; margin:0 auto; padding:0 clamp(14px, 4.5vw, 20px);
+    /* notched phones in landscape: keep content clear of the sensor housing */
+    padding-left:max(clamp(14px, 4.5vw, 20px), env(safe-area-inset-left, 0px));
+    padding-right:max(clamp(14px, 4.5vw, 20px), env(safe-area-inset-right, 0px));
+  }

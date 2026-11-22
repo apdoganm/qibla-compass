@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="color-scheme" content="light" />
 <link rel="icon" href="data:," />
-<title>بوصلة القبلة</title>
+<title>اتجاه القبلة</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
@@ -16,14 +16,15 @@
 <div class="wrap">
 
   <!-- Top strip -->
-  <div class="topbar">
+  <header class="topbar">
     <div class="place">
       <svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 21s-7-5.5-7-11a7 7 0 1 1 14 0c0 5.5-7 11-7 11Z" stroke="#000" stroke-width="1.8"/><circle cx="12" cy="10" r="2.6" fill="#000"/></svg>
       <span id="placeText">مكة المكرمة — الكعبة المشرفة</span>
     </div>
     <div class="live-dot" id="liveDot"><i></i><span id="liveText">البوصلة غير مفعّلة</span></div>
-  </div>
+  </header>
 
+  <main>
   <!-- Hero -->
   <section class="hero">
     <div>
@@ -47,7 +48,7 @@
         </button>
         <button class="btn btn-ghost" id="locateBtn">تحديث موقعي</button>
       </div>
-      <p class="hint">يعمل الحساب فلكياً من إحداثياتك — لا تُحفظ أي بيانات موقع خارج جهازك.</p>
+      <p class="hint">يعمل الحساب فلكياً من إحداثياتك — موقعك يُحفظ على جهازك فقط، وتُرسل إحداثياته لخدمة خرائط لعرض اسم مدينتك في الأعلى.</p>
     </div>
 
     <!-- Compass -->
@@ -71,7 +72,7 @@
             <div class="qibla-line"></div>
             <div class="kaaba-marker">
               <!-- Kaaba SVG: black cube, gold band -->
-              <svg width="34" height="34" viewBox="0 0 48 48" aria-label="الكعبة المشرفة">
+              <svg width="34" height="34" viewBox="0 0 48 48" role="img" aria-label="الكعبة المشرفة">
                 <rect x="7" y="12" width="34" height="30" rx="2.5" fill="#0a0a0a"/>
                 <rect x="7" y="18.5" width="34" height="5" fill="#c9a227"/>
                 <rect x="7" y="20.1" width="34" height="1.8" fill="#e8c95a"/>
@@ -122,11 +123,6 @@
       <div class="calib-warn" id="calibWarn" role="alert">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3 2.5 20h19L12 3Z" stroke="#000" stroke-width="1.8" stroke-linejoin="round"/><path d="M12 10v4.4" stroke="#000" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="17.2" r="1.2" fill="#000"/></svg>
         <span>دقة البوصلة منخفضة الآن — لن نؤكد الاصطفاف حتى تتحسن. حرّك هاتفك على شكل الرقم 8 عدة مرات للمعايرة، وابتعد عن المعدن والمغناطيس.</span>
-      </div>
-
-      <div class="manual" id="manualBox">
-        <label for="manualRange">معاينة يدوية — لأجهزة الكمبيوتر أو الهواتف بدون مستشعر بوصلة: حرّك المؤشر لتجربة الاصطفاف</label>
-        <input type="range" id="manualRange" min="0" max="359" value="40" step="0.5" />
       </div>
     </div>
   </section>
@@ -187,6 +183,7 @@
       <p><strong>لأعلى دقة:</strong> عايِر البوصلة بتحريك هاتفك على شكل الرقم 8 عدة مرات، وابتعد عن الأجسام المعدنية والأجهزة الكهربائية والمغناطيس، فهي تشوّش المستشعر. إن كنت داخل مبنى، جرّب قرب نافذة أو في مكان مفتوح. وبوصلة الهاتف تقيس من الشمال المغناطيسي، لذلك تُصحَّح قراءتها تلقائياً إلى الشمال الحقيقي بنموذج WMM2025 العالمي حسب موقعك وتاريخ اليوم — وقيمة التصحيح المطبقة ظاهرة في بطاقة «التصحيح المغناطيسي» بالأعلى. وتُعرض القراءات بدرجات كاملة ويُحتسب الاصطفاف ضمن ±٥°.</p>
     </div>
   </section>
+  </main>
 
   <footer>
     <span>زاوية القبلة تُحسب بالحساب الكروي من إحداثيات الكعبة المشرفة (21.4225° شمالاً، 39.8262° شرقاً)، والانحراف المغناطيسي بنموذج WMM2025 (NOAA/NCEI).</span>

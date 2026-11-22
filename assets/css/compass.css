@@ -1,10 +1,12 @@
 /* ============================================================
-   بوصلة القبلة — compass dial & mode switch
+   اتجاه القبلة — compass dial & mode switch
    ============================================================ */
   /* ===== Compass ===== */
   .compass-zone{ display:flex; flex-direction:column; align-items:center; padding:10px 0 4px; }
   .compass-wrap{
-    position:relative; width:var(--dial-size); height:var(--dial-size);
+    /* capped by the column it sits in: in the narrow two-column hero
+       range (~960-1030px) the raw token is wider than the column */
+    position:relative; width:min(var(--dial-size), 100%); aspect-ratio:1/1;
     flex:none;
   }
   /* fixed guide line + pointer (screen frame — does not rotate) */

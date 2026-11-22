@@ -1,5 +1,5 @@
 /* ============================================================
-   بوصلة القبلة — hero, status pill & buttons
+   اتجاه القبلة — hero, status pill & buttons
    ============================================================ */
   /* ===== Hero layout ===== */
   .hero{
@@ -33,7 +33,6 @@
   body.aligned .status{ border-color:var(--green); background:var(--green-soft); }
   body.aligned .status .ic{ background:var(--green); }
   body.aligned .status .ic svg *{ stroke:#fff; }
-  body.aligned .status .ic svg path{ stroke:#fff; }
 
   /* Buttons */
   .cta-row{ display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
