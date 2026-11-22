@@ -3,7 +3,7 @@
    ============================================================ */
   /* ===== Hero layout ===== */
   .hero{
-    display:grid; grid-template-columns:1fr; gap:8px;
+    display:flex; flex-direction:column;
     padding:18px 0 8px;
     /* Full first screen: topbar + hero together fill the first
        viewport, so the data cards begin strictly below the fold and
@@ -17,6 +17,20 @@
        URL-bar show/hide). */
     min-height:calc(100vh - 56px);
     min-height:calc(100svh - 56px);
+  }
+  /* Columns row: flex:1, so it grows to take whatever height the
+     bottom ad strip leaves behind and the hero stays exactly one
+     screen tall while the strip keeps its natural height. Its
+     min-height stays auto on purpose: if a column's content is
+     taller than the space left (the text column at 1280×700), the
+     hero grows past one screen — the hero's standing never-clip
+     doctrine — instead of the column spilling over the strip.
+     Inside the row the two columns keep their grid: stacked on
+     narrow screens (content centred, as the hero's own grid
+     centred it before), side by side from 1080px up. */
+  .hero-row{
+    flex:1;
+    display:grid; grid-template-columns:1fr; gap:8px;
     align-content:center;
   }
   @media (min-width:1080px){
@@ -35,7 +49,8 @@
        middle space between them. Top edges align, bottom edges
        align, at any dial size — the row simply grows if the dial's
        natural column is the taller one. */
-    .hero{ grid-template-columns:.82fr 1.18fr; gap:48px; align-items:stretch; align-content:stretch; padding:34px 0 10px; }
+    .hero{ padding:34px 0 10px; }
+    .hero-row{ grid-template-columns:.82fr 1.18fr; gap:48px; align-items:stretch; align-content:stretch; }
     /* the per-column flex/grid rhythm rules live in responsive.css
        (last in the cascade) because compass.css — loaded after this
        file — sets .compass-zone's padding and #viewCompass's display */

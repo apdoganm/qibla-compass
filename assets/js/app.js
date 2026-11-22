@@ -16,8 +16,8 @@
     // synchronously — pill + locating copy, the button's .loading
     // dots, disabled + aria-busy, and the 3 s deadline clock all
     // start in this same task, BEFORE anything that can hang is
-    // started. Geolocation then runs in parallel (its own 3 s
-    // timeout, never gating the button), and the motion-permission
+    // started. Geolocation then runs in parallel (on its own
+    // longer clock, never gating the button), and the motion-permission
     // request — where the browser exposes one — is raced against
     // 1.2 s inside requestMotionPermission(): a permission promise
     // that never settles can never block the deadline again.

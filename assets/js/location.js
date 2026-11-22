@@ -194,6 +194,31 @@
     navigator.geolocation.watchPosition(onPosition, onPositionError,
       { enableHighAccuracy: true, maximumAge: 10000 });
   }
+  /* ---------- One fix, with a realistic cold-start budget ----------
+     Geolocation is deliberately DECOUPLED from the 3 s activation
+     deadline: that deadline governs the direction-SENSOR decision
+     only. A cold first GPS fix on Android routinely needs far
+     longer than 3 s, so the one-shot request gets a real window —
+     15 s at high accuracy, accepting a cached fix up to a minute
+     old (which returns instantly). Only a TIMEOUT earns a retry:
+     exactly one, with the GPS radio off (network / cell fix) and a
+     longer cache allowance. A denial (code 1) or an unavailable
+     position (code 2) is a decided answer, never retried — it goes
+     straight to the caller's error handler. Success on either
+     attempt takes the normal success path whenever it lands: the
+     sensor decision never waits for it, and a late fix never
+     overwrites the decided unsupported state (onPosition already
+     guards the status copy). */
+  function getPositionWithRetry(onOk, onErr){
+    navigator.geolocation.getCurrentPosition(onOk, function(err){
+      if (err && err.code === 3){ // TIMEOUT — the cold fix outlived the window
+        navigator.geolocation.getCurrentPosition(onOk, onErr,
+          { enableHighAccuracy: false, timeout: 10000, maximumAge: 120000 });
+      } else {
+        onErr(err);
+      }
+    }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 });
+  }
   function requestLocation(){
     if (!('geolocation' in navigator)){
       showToast('جهازك لا يدعم تحديد الموقع');
@@ -207,10 +232,9 @@
       // distance data silently instead; onPosition already refrains
       // from overwriting the message, and an error here changes
       // nothing about the sensor decision.
-      navigator.geolocation.getCurrentPosition(function(pos){
+      getPositionWithRetry(function(pos){
         onPosition(pos);
-      }, function(){ /* keep the decided unsupported message */ },
-      { enableHighAccuracy: true, timeout: 3000, maximumAge: 10000 });
+      }, function(){ /* keep the decided unsupported message */ });
       startWatch();
       return;
     }
@@ -218,14 +242,14 @@
     statusDesc.textContent = 'لحظات ونحسب زاوية القبلة من مكانك الحالي.';
     // One explicit fix — this is the call that raises the permission prompt
     // on the very first activation. Afterwards the single watch below keeps
-    // everything updated silently; no repeated prompts or requests.
-    // The 3 s timeout — matching the activation deadline — guarantees
-    // the error callback fires, so this flow always lands in a decided
-    // state (fix or onPositionError copy) and location can never
-    // outlive the compass decision.
-    navigator.geolocation.getCurrentPosition(function(pos){
+    // everything updated silently; no repeated prompts or requests. The
+    // fix runs on its own, longer clock (see getPositionWithRetry),
+    // decoupled from the 3 s sensor deadline: it may land well after
+    // that decision, and its error copy appears only once the request
+    // itself has actually decided (fix, denial, or final timeout).
+    getPositionWithRetry(function(pos){
       onPosition(pos);
       showToast('تم تحديد موقعك بنجاح');
-    }, onPositionError, { enableHighAccuracy: true, timeout: 3000, maximumAge: 10000 });
+    }, onPositionError);
     startWatch();
   }

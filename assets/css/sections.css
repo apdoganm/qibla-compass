@@ -26,12 +26,25 @@
   .note p{ margin:0; font-size:14px; color:var(--ink-2); }
   .note strong{ color:var(--ink); }
 
-  /* ===== Ad slots (Adsterra — below the tool only, never in/above the hero) ===== */
+  /* ===== Ad slots (Adsterra — two below the tool, plus one strip at
+     the very bottom of the hero, below both columns) ===== */
   .ad-slot{ margin:40px auto; text-align:center; }
   .ad-caption{ font-size:12px; color:var(--sub); margin:0 0 10px; }
   .ad-banner{ min-height:250px; }
   .ad-banner iframe{ display:block; margin:0 auto; max-width:100%; }
   .ad-native{ max-width:760px; }
+  /* Hero strip (320×50): the hero's last flex row, full width. Its
+     TOTAL block height is a fixed 90px — margin-top 14 + caption 18
+     (12px font × 1.5 line-height) + caption margin-bottom 8 + 50px
+     iframe + margin-bottom 0 — and the ≥600px dial token in
+     responsive.css reserves exactly those 90px on top of the old
+     overhead, so the first screen still fits to the pixel.
+     min-height:76px (= 18 + 8 + 50, the block without its top
+     margin) reserves the space before the ad script lands, so the
+     hero does not shift when the iframe fills. */
+  .ad-hero-strip{ margin:14px 0 0; width:100%; min-height:76px; }
+  .ad-hero-strip .ad-caption{ margin:0 0 8px; line-height:1.5; }
+  .ad-hero-strip iframe{ display:block; margin:0 auto; max-width:100%; }
 
   footer{
     margin-top:52px; border-top:1px solid var(--line-soft);

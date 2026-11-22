@@ -15,12 +15,17 @@
            mode switch 54px (44px button + 8 padding + 2 border)
            mode-switch margin-bottom 22px
            under-compass 51px (26 margin + ~25 turn hint)
-           = 226px, + 16px safety margin → 242px.
+           hero ad strip 90px (margin-top 14 + caption 18
+             [12px font × 1.5 line-height] + caption margin-bottom 8
+             + 50px iframe + margin-bottom 0) — the strip is a flex
+             row of the hero, so the columns row above it shrinks by
+             exactly this block and the reserve must grow with it
+           = 226px, + 90px strip, + 16px safety margin → 332px.
          Still ONE min() expression, so the circle guarantee holds:
          height-bound → shrink, never squash. vh line first
          (universal fallback), svh line enhances it. */
-      --dial-size:min(64vw, 700px, calc(100vh - 242px));
-      --dial-size:min(64vw, 700px, calc(100svh - 242px));
+      --dial-size:min(64vw, 700px, calc(100vh - 332px));
+      --dial-size:min(64vw, 700px, calc(100svh - 332px));
     }
   }
   /* ===== Desktop hero rhythm (≥1080px two-column) =====
@@ -34,8 +39,8 @@
      note simply follows the buttons at exactly 32px in EVERY
      layout, this one included. */
   @media (min-width:1080px){
-    .hero > div:first-child{ display:flex; flex-direction:column; }
-    .hero > div:first-child .hint{ margin-top:32px; }
+    .hero-row > div:first-child{ display:flex; flex-direction:column; }
+    .hero-row > div:first-child .hint{ margin-top:32px; }
     .compass-zone{ padding:0; }
     #viewCompass{ flex:1; width:100%; display:grid; grid-template-rows:1fr auto; justify-items:center; }
     #viewCompass .compass-wrap{ align-self:center; }
