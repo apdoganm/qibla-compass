@@ -17,7 +17,9 @@ design, copy and styling are unchanged — the code is only split into files.
 - The hero fills the entire first viewport (top bar + hero), so the data
   cards below it appear only after scrolling. The dial is sized by a
   single width-and-height-aware expression (`--dial-size`: 88vw on
-  phones; `min(64vw, 700px, 92svh)` from 600px up) and is a perfect
+  phones; `min(64vw, 700px, calc(100svh - 242px))` from 600px up —
+  the height term reserves the measured first-screen overhead, so
+  the dial always fits entirely inside the first screen) and is a perfect
   circle at every size: when the viewport height constrains, the
   circle shrinks — it never squashes. On desktop the two hero columns
   share one vertical rhythm: the mode switch tops the compass column

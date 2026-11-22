@@ -4,13 +4,23 @@
   /* ===== Small phones, large phones & tablets ===== */
   @media (min-width:600px){
     :root{
-      /* Desktop/tablet dial: deliberately dramatic — a 700px cap and a
-         64vw share, with the height term relaxed to 92svh so it only
-         prevents true overflow (the hero is min-height and may grow a
-         little; dial size wins). Still ONE min() expression, so the
-         circle guarantee holds: height-bound → shrink, never squash. */
-      --dial-size:min(64vw, 700px, 92vh);
-      --dial-size:min(64vw, 700px, 92svh);
+      /* Desktop/tablet dial: a 700px cap and a 64vw share, but the
+         height term now reserves the MEASURED fixed overhead of the
+         first screen, so the dial is the largest circle that fits
+         ENTIRELY inside it — the hero never grows past 100svh on
+         desktop heights ≥700px to accommodate it; the dial yields.
+         Measured overhead (from the CSS values themselves):
+           topbar 55px (padding 16+4, tallest child .live-dot 35.25)
+           hero padding 44px (34 top + 10 bottom, ≥1080px)
+           mode switch 54px (44px button + 8 padding + 2 border)
+           mode-switch margin-bottom 22px
+           under-compass 51px (26 margin + ~25 turn hint)
+           = 226px, + 16px safety margin → 242px.
+         Still ONE min() expression, so the circle guarantee holds:
+         height-bound → shrink, never squash. vh line first
+         (universal fallback), svh line enhances it. */
+      --dial-size:min(64vw, 700px, calc(100vh - 242px));
+      --dial-size:min(64vw, 700px, calc(100svh - 242px));
     }
   }
   /* ===== Desktop hero rhythm (≥1080px two-column) =====

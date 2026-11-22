@@ -9,12 +9,14 @@
        viewport, so the data cards begin strictly below the fold and
        appear only after scrolling. min-height (never fixed height):
        on short screens the hero simply grows and the page scrolls —
-       nothing is ever clipped. The 52px offset is the minimum real
-       topbar height, so topbar + hero >= 100svh at every width and
-       zero pixels of the next section can peek into the first paint.
-       vh first, svh enhancement (stable on mobile URL-bar show/hide). */
-    min-height:calc(100vh - 52px);
-    min-height:calc(100svh - 52px);
+       nothing is ever clipped. The 56px offset is the measured
+       topbar height (55.25px: 16+4 padding around the 35.25px
+       live-dot) rounded up, so topbar + hero <= 100svh at every
+       width and zero pixels of the next section can peek into the
+       first paint. vh first, svh enhancement (stable on mobile
+       URL-bar show/hide). */
+    min-height:calc(100vh - 56px);
+    min-height:calc(100svh - 56px);
     align-content:center;
   }
   @media (min-width:1080px){
