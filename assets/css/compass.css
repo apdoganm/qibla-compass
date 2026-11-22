@@ -182,5 +182,9 @@
     box-shadow:0 2px 10px rgba(0,0,0,.10);
   }
 
-  #viewCompass{ display:flex; flex-direction:column; align-items:center; }
+  /* width:100% is load-bearing: .compass-zone is a column flex with
+     align-items:center, so without it this view shrink-wraps to its
+     widest in-flow child (the turn hint, ~216px) and the dial's 100%
+     cap collapses to that width on every stacked layout. */
+  #viewCompass{ display:flex; flex-direction:column; align-items:center; width:100%; }
   #viewCompass[hidden]{ display:none; }
