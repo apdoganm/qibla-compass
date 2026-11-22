@@ -11,8 +11,8 @@
      (e.g. phones rendering a ~980px-wide desktop-mode viewport). */
   @media (min-width:600px){
     :root{
-      --dial-size:min(94vw, 700px, 80vh);
-      --dial-size:min(94vw, 700px, 80svh);
+      --dial-size:min(90vw, 700px, 80vh);
+      --dial-size:min(90vw, 700px, 80svh);
     }
   }
   /* ===== Desktop dial (≥1080px, two-column hero only) ===== */
