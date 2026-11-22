@@ -18,7 +18,7 @@
   <!-- Top strip -->
   <header class="topbar">
     <div class="brand">
-      <img src="assets/logo.svg" alt="" width="36" height="36" />
+      <img src="assets/logo.svg" alt="" width="28" height="28" />
       <span>اتجاه القبلة</span>
     </div>
     <div class="place">
@@ -26,6 +26,7 @@
       <span id="placeText">مكة المكرمة — الكعبة المشرفة</span>
     </div>
     <div class="live-dot" id="liveDot"><i></i><span id="liveText">البوصلة غير مفعّلة</span></div>
+    <div class="device-chip" id="deviceChip"><span id="deviceLabel">تتصفح من: —</span></div>
   </header>
 
   <main>
@@ -33,7 +34,7 @@
   <section class="hero">
     <div>
       <h1>اعرف اتجاه القبلة بدقة، <span class="thin">من أي مكان في العالم</span></h1>
-      <p class="lede">بوصلة مباشرة تستخدم موقعك واتجاه هاتفك لتدلّك على اتجاه الكعبة المشرفة أينما كنت، بخطوات بسيطة ودون تخمين.</p>
+      <p class="lede">بوصلة مباشرة تستخدم موقعك واتجاه {device} لتدلّك على اتجاه الكعبة المشرفة أينما كنت، بخطوات بسيطة ودون تخمين.</p>
 
       <div class="status" id="statusBox" role="status" aria-live="polite">
         <div class="ic" id="statusIcon">
@@ -41,7 +42,7 @@
         </div>
         <div>
           <strong id="statusTitle">فعّل البوصلة لبدء التحديد</strong>
-          <span id="statusDesc">نحتاج إذن الموقع وحركة الهاتف لحساب اتجاه القبلة من مكانك الحالي.</span>
+          <span id="statusDesc">نحتاج إذن الموقع وحركة {deviceBare} لحساب اتجاه القبلة من مكانك الحالي.</span>
         </div>
       </div>
 
@@ -91,7 +92,7 @@
         <div class="top-pointer"></div>
         <div class="hub">
           <div class="big" id="hubHeading">—°</div>
-          <div class="lbl">اتجاه هاتفك الآن</div>
+          <div class="lbl">اتجاه {device} الآن</div>
           <div class="diff" id="hubDiff">بانتظار التفعيل</div>
         </div>
       </div>
@@ -99,7 +100,7 @@
       <div class="under-compass">
         <div class="turn-hint" id="turnHint">
           <span class="arr" id="turnArrow">⟳</span>
-          <span id="turnText">فعّل البوصلة ثم حرّك هاتفك ببطء</span>
+          <span id="turnText">فعّل البوصلة ثم حرّك {device} ببطء</span>
         </div>
       </div>
       </div><!-- /viewCompass -->
@@ -126,7 +127,7 @@
 
       <div class="calib-warn" id="calibWarn" role="alert">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3 2.5 20h19L12 3Z" stroke="#000" stroke-width="1.8" stroke-linejoin="round"/><path d="M12 10v4.4" stroke="#000" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="17.2" r="1.2" fill="#000"/></svg>
-        <span>دقة البوصلة منخفضة الآن — لن نؤكد الاصطفاف حتى تتحسن. حرّك هاتفك على شكل الرقم 8 عدة مرات للمعايرة، وابتعد عن المعدن والمغناطيس.</span>
+        <span>دقة البوصلة منخفضة الآن — لن نؤكد الاصطفاف حتى تتحسن. حرّك {device} على شكل الرقم 8 عدة مرات للمعايرة، وابتعد عن المعدن والمغناطيس.</span>
       </div>
     </div>
   </section>
@@ -163,7 +164,7 @@
   <!-- Steps -->
   <section class="section">
     <h2>ثلاث خطوات، وقبلتك صحيحة</h2>
-    <p class="sub">البوصلة تعتمد على مستشعر هاتفك المغناطيسي وحساب فلكي لموضع الكعبة من إحداثياتك — النتيجة لحظية وتتحدث مع كل حركة. بدّل في أي وقت بين البوصلة وشريط الاتجاه من المبدّل أعلى الأداة؛ الطريقتان بنفس الحساب ونفس إشارة الاصطفاف الخضراء والاهتزاز.</p>
+    <p class="sub">البوصلة تعتمد على مستشعر {device} المغناطيسي وحساب فلكي لموضع الكعبة من إحداثياتك — النتيجة لحظية وتتحدث مع كل حركة. بدّل في أي وقت بين البوصلة وشريط الاتجاه من المبدّل أعلى الأداة؛ الطريقتان بنفس الحساب ونفس إشارة الاصطفاف الخضراء والاهتزاز.</p>
     <div class="steps">
       <div class="step">
         <div class="num">١</div>
@@ -172,26 +173,26 @@
       </div>
       <div class="step">
         <div class="num">٢</div>
-        <h3>حرّك هاتفك ببطء</h3>
-        <p>أمسك الهاتف أفقياً ولفّ جسمك يميناً أو يساراً متبعاً إرشاد الأسهم، حتى يقترب خط البوصلة من الكعبة.</p>
+        <h3>حرّك {device} ببطء</h3>
+        <p>أمسك {deviceBare} أفقياً ولفّ جسمك يميناً أو يساراً متبعاً إرشاد الأسهم، حتى يقترب خط البوصلة من الكعبة.</p>
       </div>
       <div class="step">
         <div class="num">٣</div>
         <h3>الأخضر يعني الاصطفاف</h3>
-        <p>حين يصطف الخط مع الكعبة تماماً يتحوّل المؤشر للأخضر ويهتزّ الهاتف — هذا اتجاه صلاتك الصحيح.</p>
+        <p>حين يصطف الخط مع الكعبة تماماً يتحوّل المؤشر للأخضر ويهتزّ {deviceBare} — هذا اتجاه صلاتك الصحيح.</p>
       </div>
     </div>
 
     <div class="note">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9.2" stroke="#000" stroke-width="1.8"/><path d="M12 11v5" stroke="#000" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="8" r="1.3" fill="#000"/></svg>
-      <p><strong>لأعلى دقة:</strong> عايِر البوصلة بتحريك هاتفك على شكل الرقم 8 عدة مرات، وابتعد عن الأجسام المعدنية والأجهزة الكهربائية والمغناطيس، فهي تشوّش المستشعر. إن كنت داخل مبنى، جرّب قرب نافذة أو في مكان مفتوح. وبوصلة الهاتف تقيس من الشمال المغناطيسي، لذلك تُصحَّح قراءتها تلقائياً إلى الشمال الحقيقي بنموذج WMM2025 العالمي حسب موقعك وتاريخ اليوم — وقيمة التصحيح المطبقة ظاهرة في بطاقة «التصحيح المغناطيسي» بالأعلى. وتُعرض القراءات بدرجات كاملة ويُحتسب الاصطفاف ضمن ±٥°.</p>
+      <p><strong>لأعلى دقة:</strong> عايِر البوصلة بتحريك {device} على شكل الرقم 8 عدة مرات، وابتعد عن الأجسام المعدنية والأجهزة الكهربائية والمغناطيس، فهي تشوّش المستشعر. إن كنت داخل مبنى، جرّب قرب نافذة أو في مكان مفتوح. وبوصلة {deviceBare} تقيس من الشمال المغناطيسي، لذلك تُصحَّح قراءتها تلقائياً إلى الشمال الحقيقي بنموذج WMM2025 العالمي حسب موقعك وتاريخ اليوم — وقيمة التصحيح المطبقة ظاهرة في بطاقة «التصحيح المغناطيسي» بالأعلى. وتُعرض القراءات بدرجات كاملة ويُحتسب الاصطفاف ضمن ±٥°.</p>
     </div>
   </section>
   </main>
 
   <footer>
     <div class="foot-brand">
-      <img src="assets/logo.svg" alt="" width="22" height="22" />
+      <img src="assets/logo.svg" alt="" width="20" height="20" />
       <span>اتجاه القبلة</span>
     </div>
     <span>زاوية القبلة تُحسب بالحساب الكروي من إحداثيات الكعبة المشرفة (21.4225° شمالاً، 39.8262° شرقاً)، والانحراف المغناطيسي بنموذج WMM2025 (NOAA/NCEI).</span>
@@ -203,6 +204,7 @@
 
 <script src="assets/js/vendor/magvar.js"></script>
 <script src="assets/js/geo.js"></script>
+<script src="assets/js/device.js"></script>
 <script src="assets/js/state.js"></script>
 <script src="assets/js/filter.js"></script>
 <script src="assets/js/dial.js"></script>

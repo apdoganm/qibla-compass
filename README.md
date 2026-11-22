@@ -41,6 +41,20 @@ design, copy and styling are unchanged — the code is only split into files.
   distance, coordinates, declination) still populates normally, and a
   real heading sample arriving later clears the state automatically.
   (iOS motion-permission denial keeps its own separate message.)
+- Device-type awareness: the site detects whether the visitor is on a
+  phone, a tablet or a computer (classic UA parsing, with the iPadOS
+  Macintosh-UA + multi-touch case read as a tablet and Windows touch
+  laptops kept as computers; UA Client Hints refine the result
+  asynchronously when available). A neutral chip in the top bar shows
+  «تتصفح من: هاتف / جهاز لوحي / كمبيوتر», and every string that names
+  the visitor's device adapts to it — «حرّك هاتفك» on a phone,
+  «حرّك جهازك اللوحي» on a tablet, «حرّك كمبيوترك» on a computer —
+  via the `{device}` / `{deviceBare}` tokens that `device.js` fills
+  (`QiblaDevice.fill()` for JS-set strings, in-place at boot for
+  static HTML copy). The one deliberate exception is the
+  unsupported-sensor advice «افتح نفس الرابط من هاتفك»: it tells the
+  visitor to switch TO a phone, so it stays phone-specific on every
+  device.
 - Arabic-first, full RTL, IBM Plex Sans Arabic.
 
 ## Project structure
@@ -48,8 +62,9 @@ design, copy and styling are unchanged — the code is only split into files.
 ```
 index.html                  Semantic markup only; links the CSS/JS below.
 assets/
-  logo.svg                  Site logo (isometric Kaaba) — header, footer
-                            and favicon.
+  logo.svg                  Site logo: a minimal front-view Kaaba mark
+                            (black cube, one gold band, small gold door)
+                            — header, footer and favicon.
   css/
     main.css                Entry point — @imports the partials in the
                             original cascade order (responsive last).
@@ -68,6 +83,9 @@ assets/
                             edit its internals or coefficients).
     geo.js                  Kaaba constants, Qibla/distance spherical math,
                             angle helpers, number formatting.
+    device.js               Device-type awareness (phone / tablet /
+                            computer), the top-bar device chip, and the
+                            {device} / {deviceBare} wording tokens.
     state.js                DOM references + shared application state.
     filter.js               One Euro heading filter.
     dial.js                 Builds the dial ticks/numbers/cardinals.

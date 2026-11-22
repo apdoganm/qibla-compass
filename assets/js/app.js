@@ -126,7 +126,7 @@
       } else if (!isAligned && state.aligned){
         state.aligned = false;
         document.body.classList.remove('aligned');
-        statusTitle.textContent = 'تم تحديد موقعك — حرّك هاتفك';
+        statusTitle.textContent = QiblaDevice.fill('تم تحديد موقعك — حرّك {device}');
         statusDesc.textContent = 'الآن لفّ جسمك ببطء حتى يصطف الخط مع الكعبة.';
         statusIcon.innerHTML = '<svg width="21" height="21" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="#000" stroke-width="1.8"/><path d="M15.5 8.5 13 13l-4.5 2.5L11 11l4.5-2.5Z" fill="#000"/></svg>';
       }
@@ -136,25 +136,25 @@
         hubDiff.className = 'diff ok';
         dAlign.textContent = 'مصطف تماماً';
         dAlignSub.textContent = 'الفرق ' + fmt(diff, 0) + '° فقط — صلِّ مطمئناً';
-        turnText.textContent = 'ثبّت هاتفك — هذا هو اتجاه القبلة';
+        turnText.textContent = QiblaDevice.fill('ثبّت {device} — هذا هو اتجاه القبلة');
         turnArrow.textContent = '✓';
         turnArrow.style.transform = 'none';
       } else {
         hubDiff.textContent = 'الفرق ' + fmt(diff, 0) + '°';
         hubDiff.className = 'diff';
         dAlign.textContent = fmt(diff, 0) + '°';
-        dAlignSub.textContent = signed > 0 ? 'أدر هاتفك يميناً لتقليل الفرق' : 'أدر هاتفك يساراً لتقليل الفرق';
+        dAlignSub.textContent = signed > 0 ? QiblaDevice.fill('أدر {device} يميناً لتقليل الفرق') : QiblaDevice.fill('أدر {device} يساراً لتقليل الفرق');
         if (state.enabled){
           turnText.textContent = signed > 0
-            ? 'أدر هاتفك يميناً بمقدار ' + fmt(Math.abs(signed), 0) + '°'
-            : 'أدر هاتفك يساراً بمقدار ' + fmt(Math.abs(signed), 0) + '°';
+            ? QiblaDevice.fill('أدر {device} يميناً بمقدار ') + fmt(Math.abs(signed), 0) + '°'
+            : QiblaDevice.fill('أدر {device} يساراً بمقدار ') + fmt(Math.abs(signed), 0) + '°';
           turnArrow.textContent = signed > 0 ? '⟶' : '⟵';
           turnArrow.style.transform = 'none';
         }
       }
       if (!state.aligned && state.compassUnreliable && diff <= ALIGN_TOL){
         hubDiff.textContent = 'قريب جداً — المعايرة مطلوبة';
-        turnText.textContent = 'حرّك هاتفك على شكل الرقم 8 لمعايرة البوصلة، ثم أعد المحاولة';
+        turnText.textContent = QiblaDevice.fill('حرّك {device} على شكل الرقم 8 لمعايرة البوصلة، ثم أعد المحاولة');
         turnArrow.textContent = '∞';
         turnArrow.style.transform = 'none';
       }

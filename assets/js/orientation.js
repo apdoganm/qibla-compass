@@ -76,7 +76,7 @@
     enableBtn.textContent = 'البوصلة مفعّلة';
     enableBtn.setAttribute('disabled', 'disabled');
     if (state.qibla !== null){
-      statusTitle.textContent = 'تم تحديد موقعك — حرّك هاتفك';
+      statusTitle.textContent = QiblaDevice.fill('تم تحديد موقعك — حرّك {device}');
       statusDesc.textContent = 'الآن لفّ جسمك ببطء حتى يصطف الخط مع الكعبة.';
     }
   }

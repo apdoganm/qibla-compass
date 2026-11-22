@@ -8,11 +8,13 @@
     padding:16px 0 4px;
   }
   .brand{
-    display:flex; align-items:center; gap:10px;
+    display:flex; flex-direction:row; align-items:center; gap:10px;
+    flex:none; line-height:1;
     font-size:17px; font-weight:700; color:var(--ink);
     letter-spacing:-0.01em;
   }
   .brand img{ flex:none; display:block; }
+  .brand span{ white-space:nowrap; line-height:1; }
   .topbar .place{
     display:flex; align-items:center; gap:8px;
     font-size:13px; font-weight:500; color:var(--ink-2);
@@ -31,3 +33,12 @@
   .live-dot.on{ color:var(--ink); }
   body.unsupported .live-dot{ color:var(--red); border-color:var(--red-line); background:var(--red-soft); }
   body.unsupported .live-dot i{ background:var(--red); box-shadow:0 0 0 4px #fdecea; }
+  /* Device chip: which device the visitor is browsing from
+     (هاتف / جهاز لوحي / كمبيوتر) — same pill family as .live-dot,
+     neutral in every state. Text is set by device.js. */
+  .device-chip{
+    display:inline-flex; align-items:center;
+    font-size:12.5px; font-weight:500; color:var(--sub);
+    border:1px solid var(--line); border-radius:999px; padding:6px 12px;
+    background:#fff; white-space:nowrap;
+  }

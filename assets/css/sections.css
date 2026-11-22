@@ -32,9 +32,11 @@
     display:flex; flex-wrap:wrap; gap:8px 20px; justify-content:space-between;
   }
   .foot-brand{
-    display:flex; align-items:center; gap:8px;
+    display:flex; flex-direction:row; align-items:center; gap:8px;
+    line-height:1;
     font-size:14px; font-weight:700; color:var(--ink);
   }
+  .foot-brand span{ white-space:nowrap; line-height:1; }
   .foot-brand img{ flex:none; display:block; }
   .toast{
     position:fixed; left:50%; bottom:calc(22px + env(safe-area-inset-bottom, 0px)); transform:translate(-50%, 90px);

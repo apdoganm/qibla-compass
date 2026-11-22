@@ -174,7 +174,7 @@
     applyPosition(lat, lon, acc);
     savePosition(lat, lon, acc);
     if (!state.aligned && !state.unsupported){
-      statusTitle.textContent = 'تم تحديد موقعك — حرّك هاتفك';
+      statusTitle.textContent = QiblaDevice.fill('تم تحديد موقعك — حرّك {device}');
       statusDesc.textContent = 'الآن لفّ جسمك ببطء حتى يصطف الخط مع الكعبة. وسيُحدّث موقعك تلقائياً إذا تحركت.';
     }
   }
