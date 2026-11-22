@@ -29,3 +29,5 @@
   }
   .live-dot.on i{ background:var(--green); box-shadow:0 0 0 4px var(--green-soft); }
   .live-dot.on{ color:var(--ink); }
+  body.unsupported .live-dot{ color:var(--red); border-color:var(--red-line); background:var(--red-soft); }
+  body.unsupported .live-dot i{ background:var(--red); box-shadow:0 0 0 4px #fdecea; }

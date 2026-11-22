@@ -44,6 +44,7 @@
     font-variant-numeric:tabular-nums; direction:ltr;
   }
   .strip .s-guide{ font-size:17px; font-weight:600; }
+  body.unsupported .strip .s-guide{ color:var(--red); }
   .strip .s-sub{ font-size:13px; opacity:.85; }
   .strip.idle{ background:#f1f1f1; color:var(--ink-2); border:1px solid var(--line); }
   .strip.idle .center-notch{ background:#bbb; }

@@ -112,6 +112,8 @@
     transition:border-color .35s;
   }
   body.aligned .hub{ border-color:var(--green); }
+  body.unsupported .hub{ border-color:var(--red-line); }
+  body.unsupported .hub .diff{ color:var(--red); }
   .hub .big{
     font-size:clamp(21px, 6.2vw, 34px); font-weight:700; line-height:1.1;
     font-variant-numeric:tabular-nums; direction:ltr;

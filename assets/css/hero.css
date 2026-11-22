@@ -33,6 +33,12 @@
   body.aligned .status{ border-color:var(--green); background:var(--green-soft); }
   body.aligned .status .ic{ background:var(--green); }
   body.aligned .status .ic svg *{ stroke:#fff; }
+  /* Unsupported-sensor error state: the message reads as an error */
+  body.unsupported .status{ border-color:var(--red-line); background:var(--red-soft); }
+  body.unsupported .status strong{ color:var(--red); }
+  body.unsupported .status .ic{ background:#fdecea; }
+  body.unsupported .status .ic svg circle{ stroke:var(--red); }
+  body.unsupported .status .ic svg path{ fill:var(--red); }
 
   /* Buttons */
   .cta-row{ display:flex; flex-wrap:wrap; gap:10px; align-items:center; }

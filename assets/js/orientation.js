@@ -60,6 +60,7 @@
   function enterUnsupported(){
     if (state.sensorSeen || state.unsupported) return;
     state.unsupported = true;
+    document.body.classList.add('unsupported');
     liveDot.classList.remove('on');
     liveText.textContent = 'تحديد الاتجاه غير مدعوم على هذا الجهاز';
     statusTitle.textContent = 'هذا الجهاز لا يدعم تحديد الاتجاه';
@@ -71,6 +72,7 @@
   }
   function clearUnsupported(){
     state.unsupported = false;
+    document.body.classList.remove('unsupported');
     enableBtn.textContent = 'البوصلة مفعّلة';
     enableBtn.setAttribute('disabled', 'disabled');
     if (state.qibla !== null){
