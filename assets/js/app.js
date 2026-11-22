@@ -81,6 +81,28 @@
     state.lastVibrate = now;
     if (navigator.vibrate){ try { navigator.vibrate([70, 50, 70]); } catch(e){} }
   }
+  /* Lucide icon strings swapped in by the render loop — same official
+     geometry as the static markup icons, stroke:currentColor so the
+     state colours (red hub warning, white-on-green status check…)
+     come from the component's CSS color. */
+  var LUCIDE_ATTRS = 'fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"';
+  var ICON_WARN = '<svg width="34" height="34" viewBox="0 0 24 24" ' + LUCIDE_ATTRS + '><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>';
+  var ICON_STATUS_CHECK = '<svg width="20" height="20" viewBox="0 0 24 24" ' + LUCIDE_ATTRS + '><path d="M20 6 9 17l-5-5"/></svg>';
+  var ICON_STATUS_COMPASS = '<svg width="20" height="20" viewBox="0 0 24 24" ' + LUCIDE_ATTRS + '><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>';
+  var ICON_TURN_R = '<svg width="18" height="18" viewBox="0 0 24 24" ' + LUCIDE_ATTRS + '><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>';
+  var ICON_TURN_L = '<svg width="18" height="18" viewBox="0 0 24 24" ' + LUCIDE_ATTRS + '><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>';
+  var ICON_TURN_OK = '<svg width="18" height="18" viewBox="0 0 24 24" ' + LUCIDE_ATTRS + '><path d="M20 6 9 17l-5-5"/></svg>';
+  var ICON_TURN_INF = '<svg width="18" height="18" viewBox="0 0 24 24" ' + LUCIDE_ATTRS + '><path d="M12 12c-2-2.67-4-4-6-4a4 4 0 1 0 0 8c2 0 4-1.33 6-4Zm0 0c2 2.67 4 4 6 4a4 4 0 0 0 0-8c-2 0-4 1.33-6 4Z"/></svg>';
+
+  /* Render-loop memo: with no heading (every desktop, and any phone
+     before activation) the frame's DOM output depends only on the
+     idle mode — pending vs unsupported — so identical frames skip
+     ALL writes. Previously tick() rewrote the dial transform, hub
+     texts and the whole strip 60×/s forever, and that constant
+     main-thread churn competed with the activation button's fill
+     animation during the 5 s window. The dial transform and the
+     calibration pill are likewise written only when they change. */
+  var lastCalibShown = null, lastDialH = null, lastIdleKey = null;
   function tick(){
     // A heading counts as real only when it comes from the device sensor
     // — never before activation.
@@ -94,7 +116,11 @@
     var relOnly = state.sensorSeen && !state.absGradeSeen &&
                   state.firstEventAt > 0 && (performance.now() - state.firstEventAt > 3000);
     state.compassUnreliable = !!(accBad || relOnly);
-    calibWarn.classList.toggle('show', hasHeading && state.compassUnreliable);
+    var calibShow = hasHeading && state.compassUnreliable;
+    if (calibShow !== lastCalibShown){
+      calibWarn.classList.toggle('show', calibShow);
+      lastCalibShown = calibShow;
+    }
     // displayHeading is the filtered MAGNETIC heading, driven directly by
     // the One Euro filter on every sensor event — no extra smoothing lag
     // is added here, so the dial tracks the hand almost 1:1 while resting
@@ -103,27 +129,36 @@
     // and only this true heading is compared with the qibla bearing
     // (which is measured from true north) or used to rotate the dial.
     var h = norm360(state.displayHeading + state.declination);
-    dial.style.transform = 'rotate(' + (-h) + 'deg)';
+    var hKey = h.toFixed(2);
+    if (hKey !== lastDialH){
+      dial.style.transform = 'rotate(' + (-h) + 'deg)';
+      lastDialH = hKey;
+    }
     if (!hasHeading){
-      if (state.unsupported && !state.activating){
-        // Unsupported hub: one warning glyph + ONE short red line.
-        // No «—°» reading, no device label — nothing can cramp or
-        // overflow the hub in this state (see compass.css).
-        hubHeading.textContent = '⚠︎';
-        hubHeading.className = 'big warn';
-        hubDiff.textContent = 'الاتجاه غير مدعوم';
-      } else {
-        hubHeading.textContent = '—°';
-        hubHeading.className = 'big';
-        hubDiff.textContent = 'بانتظار التفعيل';
+      var idleKey = (state.unsupported && !state.activating) ? 'unsupported' : 'idle';
+      if (idleKey !== lastIdleKey){
+        lastIdleKey = idleKey;
+        if (idleKey === 'unsupported'){
+          // Unsupported hub: one warning glyph + ONE short red line.
+          // No «—°» reading, no device label — nothing can cramp or
+          // overflow the hub in this state (see compass.css).
+          hubHeading.innerHTML = ICON_WARN;
+          hubHeading.className = 'big warn';
+          hubDiff.textContent = 'الاتجاه غير مدعوم';
+        } else {
+          hubHeading.textContent = '—°';
+          hubHeading.className = 'big';
+          hubDiff.textContent = 'بانتظار التفعيل';
+        }
+        hubDiff.className = 'diff';
+        dAlign.textContent = '—';
+        dAlignSub.textContent = 'الاصطفاف الدقيق ضمن ±٥°';
+        updateStrip(false, 0, 0, false, false);
       }
-      hubDiff.className = 'diff';
-      dAlign.textContent = '—';
-      dAlignSub.textContent = 'الاصطفاف الدقيق ضمن ±٥°';
-      updateStrip(false, 0, 0, false, false);
       requestAnimationFrame(tick);
       return;
     }
+    lastIdleKey = null;
     hubHeading.textContent = fmt(h, 0) + '°';
     hubHeading.className = 'big';
 
@@ -144,22 +179,22 @@
         showToast('ما شاء الله — أنت الآن في اتجاه القبلة تماماً', true);
         statusTitle.textContent = 'أنت على القبلة تماماً';
         statusDesc.textContent = 'حافظ على هذا الاتجاه — المؤشر الأخضر والاهتزاز يؤكدان الاصطفاف الدقيق.';
-        statusIcon.innerHTML = '<svg width="21" height="21" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4.5 12.5 10 18 19.5 6.5" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+        statusIcon.innerHTML = ICON_STATUS_CHECK;
       } else if (!isAligned && state.aligned){
         state.aligned = false;
         document.body.classList.remove('aligned');
         statusTitle.textContent = QiblaDevice.fill('تم تحديد موقعك — حرّك {device}');
         statusDesc.textContent = 'الآن لفّ جسمك ببطء حتى يصطف الخط مع الكعبة.';
-        statusIcon.innerHTML = '<svg width="21" height="21" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="#000" stroke-width="1.8"/><path d="M15.5 8.5 13 13l-4.5 2.5L11 11l4.5-2.5Z" fill="#000"/></svg>';
+        statusIcon.innerHTML = ICON_STATUS_COMPASS;
       }
 
       if (state.aligned){
-        hubDiff.textContent = '✓ على القبلة';
+        hubDiff.textContent = 'على القبلة';
         hubDiff.className = 'diff ok';
         dAlign.textContent = 'مصطف تماماً';
         dAlignSub.textContent = 'الفرق ' + fmt(diff, 0) + '° فقط — صلِّ مطمئناً';
         turnText.textContent = QiblaDevice.fill('ثبّت {device} — هذا هو اتجاه القبلة');
-        turnArrow.textContent = '✓';
+        turnArrow.innerHTML = ICON_TURN_OK;
         turnArrow.style.transform = 'none';
       } else {
         hubDiff.textContent = 'الفرق ' + fmt(diff, 0) + '°';
@@ -170,14 +205,14 @@
           turnText.textContent = signed > 0
             ? QiblaDevice.fill('أدر {device} يميناً بمقدار ') + fmt(Math.abs(signed), 0) + '°'
             : QiblaDevice.fill('أدر {device} يساراً بمقدار ') + fmt(Math.abs(signed), 0) + '°';
-          turnArrow.textContent = signed > 0 ? '⟶' : '⟵';
+          turnArrow.innerHTML = signed > 0 ? ICON_TURN_R : ICON_TURN_L;
           turnArrow.style.transform = 'none';
         }
       }
       if (!state.aligned && state.compassUnreliable && diff <= ALIGN_TOL){
         hubDiff.textContent = 'قريب جداً — المعايرة مطلوبة';
         turnText.textContent = QiblaDevice.fill('حرّك {device} على شكل الرقم 8 لمعايرة البوصلة، ثم أعد المحاولة');
-        turnArrow.textContent = '∞';
+        turnArrow.innerHTML = ICON_TURN_INF;
         turnArrow.style.transform = 'none';
       }
       // keep vibrating gently while staying aligned (throttled inside)

@@ -19,8 +19,23 @@
   }
   @media (min-width:1080px){
     /* two columns only where the enlarged dial truly fits beside the
-       text; below this width the layout stacks instead of squeezing */
-    .hero{ grid-template-columns:.92fr 1.08fr; gap:48px; align-items:center; padding:34px 0 10px; }
+       text; below this width the layout stacks instead of squeezing.
+       Split favours the compass (.82/1.18): at the 1320px wrap the
+       text column still lands ≈500px, so the headline never crushes.
+       SHARED VERTICAL RHYTHM (user spec): both columns stretch to the
+       same row height and become flex columns with pinned ends —
+       text column: headline at the very top, the small note pinned
+       to the bottom (margin-top:auto); compass column: mode switch
+       at the very top (zone padding removed, so its top edge is on
+       the headline's line), turn hint pinned to the bottom via the
+       1fr/auto grid inside #viewCompass, and the dial centred in the
+       middle space between them. Top edges align, bottom edges
+       align, at any dial size — the row simply grows if the dial's
+       natural column is the taller one. */
+    .hero{ grid-template-columns:.82fr 1.18fr; gap:48px; align-items:stretch; align-content:stretch; padding:34px 0 10px; }
+    /* the per-column flex/grid rhythm rules live in responsive.css
+       (last in the cascade) because compass.css — loaded after this
+       file — sets .compass-zone's padding and #viewCompass's display */
   }
   h1{
     font-size:clamp(38px, 6.4vw, 58px);
@@ -44,14 +59,13 @@
   .status strong{ display:block; font-size:16px; font-weight:600; line-height:1.45; }
   .status span{ display:block; font-size:13.5px; color:var(--sub); line-height:1.55; }
   body.aligned .status{ border-color:var(--green); background:var(--green-soft); }
-  body.aligned .status .ic{ background:var(--green); }
-  body.aligned .status .ic svg *{ stroke:#fff; }
-  /* Unsupported-sensor error state: the message reads as an error */
+  body.aligned .status .ic{ background:var(--green); color:#fff; }
+  /* Unsupported-sensor error state: the message reads as an error.
+     All status icons are Lucide (stroke:currentColor), so states
+     recolour them through the .ic color alone. */
   body.unsupported .status{ border-color:var(--red-line); background:var(--red-soft); }
   body.unsupported .status strong{ color:var(--red); }
-  body.unsupported .status .ic{ background:#fdecea; }
-  body.unsupported .status .ic svg circle{ stroke:var(--red); }
-  body.unsupported .status .ic svg path{ fill:var(--red); }
+  body.unsupported .status .ic{ background:#fdecea; color:var(--red); }
 
   /* Buttons */
   .cta-row{ display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
@@ -72,12 +86,18 @@
      decision deadline in orientation.js — never a CSS transition):
      the base turns grey, then a black fill anchored to the RIGHT
      edge sweeps left until it covers the whole button at t=5 s.
+     The fill is a full-width layer animated ONLY by transform:
+     scaleX() (GPU-composited, no layout/paint thrash — animating
+     width instead made the sweep visibly stutter). transform-origin
+     is the right edge, so scaleX(p) grows the black from the right.
      The label sits above both zones in white + difference blending:
      over the light grey it renders near-black, over the black fill
      it renders white — readable (≥4.5:1) at every fill fraction. */
   .btn-fill{
-    position:absolute; top:0; bottom:0; right:0; width:0%;
+    position:absolute; top:0; bottom:0; right:0; width:100%;
     background:var(--ink); display:none; pointer-events:none;
+    transform:scaleX(0); transform-origin:right center;
+    will-change:transform;
   }
   .btn.loading{ background:var(--btn-loading-bg); opacity:1; }
   .btn.loading .btn-fill{ display:block; }

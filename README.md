@@ -16,9 +16,13 @@ design, copy and styling are unchanged — the code is only split into files.
   approach alignment.
 - The hero fills the entire first viewport (top bar + hero), so the data
   cards below it appear only after scrolling. The dial is sized by a
-  single width-and-height-aware expression (`--dial-size`, capped at
-  560px) and is a perfect circle at every size: when the viewport
-  height constrains, the circle shrinks — it never squashes.
+  single width-and-height-aware expression (`--dial-size`: 88vw on
+  phones; `min(64vw, 700px, 92svh)` from 600px up) and is a perfect
+  circle at every size: when the viewport height constrains, the
+  circle shrinks — it never squashes. On desktop the two hero columns
+  share one vertical rhythm: the mode switch tops the compass column
+  on the headline's line, the turn hint and the text column's small
+  note share the bottom line, and the dial sits centred between them.
 - Alignment state at ±5° (6.5° exit hysteresis): the UI turns green and the
   phone vibrates (`[70, 50, 70]`) on alignment.
 - Heading pipeline: tilt-compensated azimuth, One Euro adaptive filter
@@ -50,7 +54,9 @@ design, copy and styling are unchanged — the code is only split into files.
   5-second deadline: while it runs, the status card shows the
   locating copy in the normal (non-red) styling and the activation
   button shows a loading fill (grey base, black fill sweeping from
-  the right) driven by the same rAF clock as the deadline itself.
+  the right as a GPU-composited `scaleX()` transform) driven by the
+  same rAF clock as the deadline itself. The render loop memoises
+  its idle frames, so nothing competes with that sweep.
   A valid sample inside the window fast-completes the fill (~250 ms)
   and the compass goes live; if the deadline expires first, the card
   flips to the red error message with an enabled retry button in the

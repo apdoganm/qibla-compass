@@ -4,9 +4,29 @@
   /* ===== Small phones, large phones & tablets ===== */
   @media (min-width:600px){
     :root{
-      --dial-size:min(58vw, 560px, 76vh);
-      --dial-size:min(58vw, 560px, 76svh);
+      /* Desktop/tablet dial: deliberately dramatic — a 700px cap and a
+         64vw share, with the height term relaxed to 92svh so it only
+         prevents true overflow (the hero is min-height and may grow a
+         little; dial size wins). Still ONE min() expression, so the
+         circle guarantee holds: height-bound → shrink, never squash. */
+      --dial-size:min(64vw, 700px, 92vh);
+      --dial-size:min(64vw, 700px, 92svh);
     }
+  }
+  /* ===== Desktop hero rhythm (≥1080px two-column) =====
+     Equal-height columns with pinned ends (see hero.css): text
+     column is a flex column with the note pinned to the bottom;
+     compass column drops its zone padding (switch top == headline
+     top) and #viewCompass becomes a 1fr/auto grid that fills the
+     column — dial centred in the 1fr middle, turn hint in the auto
+     row at the bottom (hint bottom == note bottom). */
+  @media (min-width:1080px){
+    .hero > div:first-child{ display:flex; flex-direction:column; }
+    .hero > div:first-child .hint{ margin-top:auto; padding-top:12px; }
+    .compass-zone{ padding:0; }
+    #viewCompass{ flex:1; width:100%; display:grid; grid-template-rows:1fr auto; justify-items:center; }
+    #viewCompass .compass-wrap{ align-self:center; }
+    #viewCompass[hidden]{ display:none; }
   }
   @media (max-width:560px){
     .cta-row{ flex-direction:column; align-items:stretch; }

@@ -4,12 +4,12 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="color-scheme" content="light" />
-<link rel="icon" type="image/svg+xml" href="assets/logo.svg?v=5" />
+<link rel="icon" type="image/svg+xml" href="assets/logo.svg?v=6" />
 <title>اتجاه القبلة</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="assets/css/main.css?v=5" />
+<link rel="stylesheet" href="assets/css/main.css?v=6" />
 </head>
 <body>
 
@@ -18,11 +18,11 @@
   <!-- Top strip -->
   <header class="topbar">
     <div class="brand">
-      <img src="assets/logo.svg?v=5" alt="" width="28" height="28" />
+      <img src="assets/logo.svg?v=6" alt="" width="28" height="28" />
       <span>اتجاه القبلة</span>
     </div>
     <div class="place">
-      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 21s-7-5.5-7-11a7 7 0 1 1 14 0c0 5.5-7 11-7 11Z" stroke="#000" stroke-width="1.8"/><circle cx="12" cy="10" r="2.6" fill="#000"/></svg>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
       <span id="placeText">مكة المكرمة — الكعبة المشرفة</span>
     </div>
     <div class="live-dot" id="liveDot"><i></i><span id="liveText">البوصلة غير مفعّلة</span></div>
@@ -37,7 +37,7 @@
 
       <div class="status" id="statusBox" role="status" aria-live="polite">
         <div class="ic" id="statusIcon">
-          <svg width="21" height="21" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="#000" stroke-width="1.8"/><path d="M15.5 8.5 13 13l-4.5 2.5L11 11l4.5-2.5Z" fill="#000"/></svg>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
         </div>
         <div>
           <strong id="statusTitle">فعّل البوصلة لبدء التحديد</strong>
@@ -49,11 +49,11 @@
         <button class="btn btn-primary" id="enableBtn">
           <span class="btn-fill" id="btnFill" aria-hidden="true"></span>
           <span class="btn-label">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="#fff" stroke-width="2"/><path d="M15.5 8.5 13 13l-4.5 2.5L11 11l4.5-2.5Z" fill="#fff"/></svg>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
             <span id="btnText">تفعيل البوصلة والموقع</span>
           </span>
         </button>
-        <button class="btn btn-ghost" id="locateBtn">تحديث موقعي</button>
+        <button class="btn btn-ghost" id="locateBtn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12h3"/><path d="M19 12h3"/><path d="M12 2v3"/><path d="M12 19v3"/><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="3"/></svg>تحديث موقعي</button>
       </div>
       <p class="hint">يعمل الحساب فلكياً من إحداثياتك — موقعك يُحفظ على جهازك فقط، وتُرسل إحداثياته لخدمة خرائط لعرض اسم مدينتك في الأعلى.</p>
     </div>
@@ -62,11 +62,11 @@
     <div class="compass-zone">
       <div class="mode-switch" role="tablist" aria-label="طريقة عرض اتجاه القبلة">
         <button class="mode-btn active" id="modeCompassBtn" role="tab" aria-selected="true">
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M15.5 8.5 13 13l-4.5 2.5L11 11l4.5-2.5Z" fill="currentColor"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
           البوصلة
         </button>
         <button class="mode-btn" id="modeStripBtn" role="tab" aria-selected="false">
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 12h13M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
           شريط الاتجاه
         </button>
       </div>
@@ -101,7 +101,7 @@
 
       <div class="under-compass">
         <div class="turn-hint" id="turnHint">
-          <span class="arr" id="turnArrow">⟳</span>
+          <span class="arr" id="turnArrow"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg></span>
           <span id="turnText">فعّل البوصلة ثم حرّك {device} ببطء</span>
         </div>
       </div>
@@ -115,11 +115,11 @@
             اتجاه الكعبة <span id="stripQiblaDeg" dir="ltr">—°</span>
           </div>
           <div class="strip-arrows" id="stripArrows" aria-hidden="true">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none"><path d="M8 5l7 7-7 7" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none"><path d="M8 5l7 7-7 7" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none"><path d="M8 5l7 7-7 7" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none"><path d="M8 5l7 7-7 7" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none"><path d="M8 5l7 7-7 7" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
           </div>
           <div class="s-deg" id="stripDeg">—°</div>
           <div class="s-guide" id="stripGuide">فعّل البوصلة لبدء التوجيه</div>
@@ -128,7 +128,7 @@
       </div>
 
       <div class="calib-warn" id="calibWarn" role="alert">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3 2.5 20h19L12 3Z" stroke="#000" stroke-width="1.8" stroke-linejoin="round"/><path d="M12 10v4.4" stroke="#000" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="17.2" r="1.2" fill="#000"/></svg>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
         <span>دقة البوصلة منخفضة الآن — لن نؤكد الاصطفاف حتى تتحسن. حرّك {device} على شكل الرقم 8 عدة مرات للمعايرة، وابتعد عن المعدن والمغناطيس.</span>
       </div>
     </div>
@@ -186,7 +186,7 @@
     </div>
 
     <div class="note">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9.2" stroke="#000" stroke-width="1.8"/><path d="M12 11v5" stroke="#000" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="8" r="1.3" fill="#000"/></svg>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
       <p><strong>لأعلى دقة:</strong> عايِر البوصلة بتحريك {device} على شكل الرقم 8 عدة مرات، وابتعد عن الأجسام المعدنية والأجهزة الكهربائية والمغناطيس، فهي تشوّش المستشعر. إن كنت داخل مبنى، جرّب قرب نافذة أو في مكان مفتوح. وبوصلة {deviceBare} تقيس من الشمال المغناطيسي، لذلك تُصحَّح قراءتها تلقائياً إلى الشمال الحقيقي بنموذج WMM2025 العالمي حسب موقعك وتاريخ اليوم — وقيمة التصحيح المطبقة ظاهرة في بطاقة «التصحيح المغناطيسي» بالأعلى. وتُعرض القراءات بدرجات كاملة ويُحتسب الاصطفاف ضمن ±٥°.</p>
     </div>
   </section>
@@ -194,7 +194,7 @@
 
   <footer>
     <div class="foot-brand">
-      <img src="assets/logo.svg?v=5" alt="" width="20" height="20" />
+      <img src="assets/logo.svg?v=6" alt="" width="20" height="20" />
       <span>اتجاه القبلة</span>
     </div>
     <span>زاوية القبلة تُحسب بالحساب الكروي من إحداثيات الكعبة المشرفة (21.4225° شمالاً، 39.8262° شرقاً)، والانحراف المغناطيسي بنموذج WMM2025 (NOAA/NCEI).</span>
@@ -204,15 +204,15 @@
 
 <div class="toast" id="toast" role="status"></div>
 
-<script src="assets/js/vendor/magvar.js?v=5"></script>
-<script src="assets/js/geo.js?v=5"></script>
-<script src="assets/js/device.js?v=5"></script>
-<script src="assets/js/state.js?v=5"></script>
-<script src="assets/js/filter.js?v=5"></script>
-<script src="assets/js/dial.js?v=5"></script>
-<script src="assets/js/ui.js?v=5"></script>
-<script src="assets/js/location.js?v=5"></script>
-<script src="assets/js/orientation.js?v=5"></script>
-<script src="assets/js/app.js?v=5"></script>
+<script src="assets/js/vendor/magvar.js?v=6"></script>
+<script src="assets/js/geo.js?v=6"></script>
+<script src="assets/js/device.js?v=6"></script>
+<script src="assets/js/state.js?v=6"></script>
+<script src="assets/js/filter.js?v=6"></script>
+<script src="assets/js/dial.js?v=6"></script>
+<script src="assets/js/ui.js?v=6"></script>
+<script src="assets/js/location.js?v=6"></script>
+<script src="assets/js/orientation.js?v=6"></script>
+<script src="assets/js/app.js?v=6"></script>
 </body>
 </html>

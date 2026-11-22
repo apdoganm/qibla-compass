@@ -28,7 +28,7 @@
     display:flex; gap:2px; align-items:center; justify-content:center;
     height:44px; direction:ltr;
   }
-  .strip-arrows svg{ flex:none; opacity:0; }
+  .strip-arrows svg{ flex:none; opacity:0; color:#fff; }
   .strip-arrows.go-right svg{ animation:chevR 1s linear infinite; }
   .strip-arrows.go-left svg{ animation:chevL 1s linear infinite; }
   @keyframes chevR{

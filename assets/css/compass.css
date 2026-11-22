@@ -111,7 +111,7 @@
   .hub{
     position:absolute; left:50%; top:50%; z-index:5;
     transform:translate(-50%,-50%);
-    width:min(34%, 136px); min-width:92px; aspect-ratio:1/1; border-radius:50%; flex:none;
+    width:min(34%, 160px); min-width:92px; aspect-ratio:1/1; border-radius:50%; flex:none;
     background:#fff; border:1px solid var(--line);
     box-shadow:0 10px 30px rgba(0,0,0,.09), inset 0 1px 0 #fff;
     display:flex; flex-direction:column; align-items:center; justify-content:center;
@@ -121,12 +121,10 @@
   body.aligned .hub{ border-color:var(--green); }
   /* Unsupported hub: glyph + one short red line only (the .lbl device
      line is hidden — app.js also swaps the big «—°» for the glyph) */
-  body.unsupported .hub{ border-color:var(--red-line); width:min(38%, 140px); padding:10px; }
+  body.unsupported .hub{ border-color:var(--red-line); width:min(38%, 168px); padding:10px; }
   body.unsupported .hub .lbl{ display:none; }
-  body.unsupported .hub .big.warn{
-    font-size:30px; line-height:1; color:var(--red);
-    font-variant-numeric:normal; direction:rtl;
-  }
+  body.unsupported .hub .big.warn{ color:var(--red); line-height:0; }
+  body.unsupported .hub .big.warn svg{ width:34px; height:34px; display:block; }
   body.unsupported .hub .diff{ color:var(--red); font-size:12.5px; margin-top:5px; line-height:1.4; }
   /* Unsupported dial: de-emphasise the measuring scale (ticks,
      numbers, cardinals) — the qibla line and Kaaba marker stay at
@@ -155,7 +153,8 @@
     display:inline-flex; align-items:center; gap:8px;
     font-size:14.5px; font-weight:600; min-height:24px;
   }
-  .turn-hint .arr{ display:inline-block; transition:transform .2s; font-size:18px; line-height:1; }
+  .turn-hint .arr{ display:inline-block; transition:transform .2s; line-height:0; }
+  .turn-hint .arr svg{ display:block; }
   body.aligned .turn-hint{ color:var(--green-dark); }
   .calib-warn{
     display:none; margin-top:14px; max-width:var(--dial-size);

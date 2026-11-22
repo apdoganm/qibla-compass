@@ -74,15 +74,19 @@
   var ACTIVATION_DEADLINE_MS = 5000;
   var FILL_FAST_MS = 250;
   /* One clock, two consumers: a single rAF loop drives BOTH the
-     activation button's loading fill (0% → 100% across exactly
+     activation button's loading fill (0 → 1 across exactly
      ACTIVATION_DEADLINE_MS, linear) and the decision deadline
      itself, timestamped from the same performance.now() readings —
-     the fill and the decision can never drift apart. */
+     the fill and the decision can never drift apart. The fill is
+     rendered as transform: scaleX() on a full-width layer (origin
+     at the right edge): composited by the GPU, so the sweep stays
+     butter-smooth — animating width instead forced layout + paint
+     every frame and visibly stuttered. */
   var activationClock = null; // { start, rafId, progress, fastFrom, fastStart }
   var reducedMotion = (typeof window.matchMedia === 'function') &&
     window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   function setBtnFill(p){
-    btnFill.style.width = (p * 100).toFixed(1) + '%';
+    btnFill.style.transform = 'scaleX(' + p.toFixed(4) + ')';
   }
   function endButtonLoading(){
     enableBtn.classList.remove('loading');
